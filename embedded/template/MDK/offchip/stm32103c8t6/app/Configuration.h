@@ -8,6 +8,7 @@
 
 #ifdef DEBUG
 #define LOG(str) com<<str
+#define DEBUG_LOG com
 #include "USART.h"
 extern USART com;
 #else

@@ -3,6 +3,7 @@
 
 #include "Vector3.h"
 #include "Matrix3.h"
+#include "Configuration.h"
 
 #define RtA 		57.324841f				
 #define AtR    		0.0174533f				
@@ -21,6 +22,7 @@ private:
 	//float q0, q1, q2, q3;    // quaternion elements representing the estimated orientation
 	//float exInt, eyInt, ezInt;    // scaled integral error
 	Vector3f mAngle;
+	Matrix3<float> mRotateMatrix;
 
 	//! Auxiliary variables to reduce number of repeated operations
 	float q0, q1, q2 , q3 ;	/** quaternion of sensor frame relative to auxiliary frame */
@@ -169,7 +171,6 @@ public:
 	{
 		float recipNorm;
 		float halfex = 0.0f, halfey = 0.0f, halfez = 0.0f;
-		static unsigned char bFilterInit = 0;
 
 		// Make filter converge to initial solution faster
 		// This function assumes you are in static position.
@@ -257,6 +258,7 @@ public:
 			gx += twoKp * halfex;
 			gy += twoKp * halfey;
 			gz += twoKp * halfez;
+//			DEBUG_LOG<<"\t\t\t\t\t\t"<<gx<<"\t"<<gy<<"\t"<<gz<<"\n";
 		}
 		
 		// Time derivative of quaternion. q_dot = 0.5*q\otimes omega.
@@ -291,11 +293,17 @@ public:
 		q2q3 = q2 * q3;
 		q3q3 = q3 * q3;   
 	}
-	Vector3f GetAngle(Vector3<int> acc, Vector3<int> gyro,float deltaT)
+	Vector3f GetAngle(Vector3<int> acc, Vector3<float> gyro,float deltaT)
 	{
-		NonlinearSO3AHRSupdate(acc.x,acc.y,acc.z,gyro.x,gyro.y,gyro.z,0,0,0,1,0.05,deltaT);
-		mAngle.x = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3; // pitch
-		mAngle.y = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3; // roll
+		NonlinearSO3AHRSupdate(gyro.x,gyro.y,gyro.z,acc.x,acc.y,acc.z,0,0,0,1,0.05,deltaT);
+//		mRotateMatrix((float)(q0q0 + q1q1 - q2q2 - q3q3),(float)(2.f * (q1*q2 + q0*q3)),       (float)(2.f * (q1*q3 - q0*q2)), 
+//						(float)(2.f * (q1*q2 - q0*q3)),  (float)(q0q0 - q1q1 + q2q2 - q3q3),   (float)(2.f * (q2*q3 + q0*q1)),
+//						(float)(2.f * (q1*q3 + q0*q2)),  (float)(2.f * (q2*q3 - q0*q1)),       (float)(q0q0 - q1q1 - q2q2 + q3q3));
+//		return mRotateMatrix.ToEuler();
+		
+		mAngle.x = asin(-2 * q1 * q3 + 2 * q0* q2)* RtA; // pitch
+		mAngle.y = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* RtA; // roll
+		mAngle.z = atan2(2*(q0*q3+q1*q2),1-2*(q2*q2+q3*q3))* RtA;//yaw
 		return mAngle;
 	}
 	

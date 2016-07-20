@@ -83,29 +83,23 @@ void loop()
 	
 	ledBlue.Blink(0,0.5,false);
 	
-	if(tskmgr.TimeSlice(record_tmgTest,0.002)) //每0.002秒执行一次
+	if(tskmgr.TimeSlice(record_tmgTest,0.02)) //每0.002秒执行一次
 	{
-		static int count=0;
-		++count;
-		if(count==10)
-		{
-			count=0;
-			gimbal.UpdateIMU0(0.02);
-		}
-//		gimbal.UpdateIMU();
+		gimbal.UpdateIMU();
 //		gimbal.UpdateMotor();
 	}
-	if(tskmgr.TimeSlice(record_tmgTest2,0.5)) //每1秒执行一次，输出电源值
+	if(tskmgr.TimeSlice(record_tmgTest2,0.2)) //每1秒执行一次，输出电源值
 	{
 		if(gimbal.IsCalibrated())
 		{
 			ledRed.Toggle();
+			com<<gimbal.mAngle.x<<"   "<<gimbal.mAngle.y<<"   "<<gimbal.mAngle.z<<"\n";
+			//com<<mpu6050.GetAccRaw().x<<"\t"<<mpu6050.GetAccRaw().y<<"\t"<<mpu6050.GetAccRaw().z<<"\t"<<mpu6050.GetGyrRaw().x<<"\t"<<mpu6050.GetGyrRaw().y<<"\t"<<mpu6050.GetGyrRaw().z<<"\n";
 		//	LOG("voltage:");LOG(gimbal.UpdateVoltage(4,5.1,1,12));LOG("\n");
 		}
 		else if(gimbal.IsCalibrating())
 			LOG("..");
 		//com<<"kp:"<<gimbal.mPIDPitch.GetKp()<<"\t"<<gimbal.mPIDPitch.GetKi()<<"\t"<<gimbal.mPIDPitch.GetKd()<<"\n";
-		com<<gimbal.mAngle.x<<"\t"<<gimbal.mAngle.y<<"\t"<<gimbal.mAngle.z<<"\n";
 	}
 	
 	if(com.ReceiveBufferSize()>0)

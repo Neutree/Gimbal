@@ -40,9 +40,7 @@ bool Gimbal::UpdateIMU()
 	if(mIns.IsGyroCalibrated())//角速度已经校准了
 	{
 		
-		Vector3f angle = mAhrs_dcm.GetAngle_InertialSensor(mIns.GetAccRaw(),mIns.GetGyr(),mIns.GetUpdateInterval());
-		mAngle.x = angle.x;
-		mAngle.y = angle.y;
+		mAngle = mAHRS_Algorithm.GetAngle(mIns.GetAccRaw(),mIns.GetGyr(),mIns.GetUpdateInterval());
 //		LOG(mAngle.x);
 //		LOG("\t");
 //		LOG(mAngle.y);

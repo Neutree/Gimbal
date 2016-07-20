@@ -55,9 +55,7 @@ public:
 		
 		mDCMMatrix.Normalize();
 		
-		mDCMMatrix.ToEuler(&mAngle.x,&mAngle.y,&mAngle.z);
-		
-		return mAngle;
+		return mDCMMatrix.ToEuler();
 	}
 	
 	Vector3f GetAngle_InertialSensor_Mag()

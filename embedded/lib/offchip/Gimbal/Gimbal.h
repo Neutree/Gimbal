@@ -36,27 +36,6 @@ public:
 	float UpdateVoltage(uint8_t channelNumber,float resister_a,float resister_b,float fullRange);
 	bool IsCalibrated();
 	bool IsCalibrating();
-	bool UpdateIMU0(float deltaT)
-	{
-		if(MOD_ERROR== mIns.Update())
-		{
-			LOG("mpu6050 error\n\n\n");
-			return false;
-		}
-		if(mIsCalibrating&&!mIns.IsGyroCalibrating())//角速度校准结束
-		{
-			mIsCalibrating = false;
-			LOG("\ncalibrate complete\n");
-	//		mMotorRoll.Enable();
-	//		mMotorPitch.Enable();
-	//		mMotorYaw.Enable();
-		}
-		if(mIns.IsGyroCalibrated())//角速度已经校准了
-		{
-			mAngle = mAHRS_Algorithm.GetAngle(mIns.GetAccRaw(),mIns.GetGyrRaw(),deltaT);
-		}
-		return true;
-	}
 	
 	PIDController mPIDRoll,mPIDPitch,mPIDYaw;
 };

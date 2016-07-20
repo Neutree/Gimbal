@@ -15,6 +15,7 @@ public:
 	Matrix3<T>(const Vector3<T> &a0, const Vector3<T> &b0, const Vector3<T> &c0) : a(a0), b(b0), c(c0) {}
 	Matrix3<T>(const T ax, const T ay, const T az, const T bx, const T by, const T bz, const T cx, const T cy, const T cz) : a(ax,ay,az), b(bx,by,bz), c(cx,cy,cz) { }
 	void operator() (const Vector3<T> &a0, const Vector3<T> &b0, const Vector3<T> &c0) {a = a0; b = b0; c = c0; }
+	void operator() (const T ax, const T ay, const T az, const T bx, const T by, const T bz, const T cx, const T cy, const T cz) {a(ax,ay,az), b(bx,by,bz), c(cx,cy,cz); }	
 	bool operator==(const Matrix3<T> &m) {  return (a==m.a && b==m.b && c==m.c);  }
 	bool operator!= (const Matrix3<T> &m){  return (a!=m.a || b!=m.b || c!=m.c);  }
 	Matrix3<T> operator-(void) const     {  return Matrix3<T>(-a,-b,-c);       }
@@ -62,11 +63,14 @@ public:
 		(*this) += temp_matrix;
 	}
 	Matrix3<T> Transpose(void) const{ return Matrix3<T>(Vector3<T>(a.x,b.x,c.x), Vector3<T>(a.y,b.y,c.y), Vector3<T>(a.z,b.z,c.z)); }
-	void ToEuler(float *roll=0, float *pitch=0, float *yaw=0) const
+	Vector3f ToEuler() const
 	{
-		if (pitch != 0) {	*pitch = -asinf(c.x);		}
-		if (roll  != 0) {	*roll  = atan2f(c.y, c.z);	}
-		if (yaw   != 0) {	*yaw   = atan2f(b.x, a.x);	}
+		Vector3f angle;
+		angle.x = -asinf(c.x);		
+		angle.y = atan2f(c.y, c.z);
+		angle.z = atan2f(b.x, a.x);
+			
+		return angle;
 	}
 };
 
