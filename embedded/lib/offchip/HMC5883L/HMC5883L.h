@@ -12,6 +12,7 @@
 #include "math.h"
 #include "Vector3.h"
 #include "TaskManager.h"
+#include "Magnetometer.h"
 
 //---------------HMC5883L Register Address ---------------------------
 #define HMC5883_ADDRESS            0x3C  //       HMC     7-bit address:  0x1E    ADRESS+WRITE->0X3C  ADRESS+READ->0X3D
@@ -125,7 +126,7 @@ typedef struct
 	unsigned char identification_C; //Register identification c  fixed balue:0x33 if read correctly
 }HMC5883DataTypeDef;
 
-class HMC5883L:public Sensor
+class HMC5883L:public Magnetometer,public Sensor
 {
 	private:
 		I2C *mI2C;
@@ -137,14 +138,14 @@ class HMC5883L:public Sensor
 	public:
 		
 		#ifdef HMC5883L_USE_TASKMANAGER
-		HMC5883L(I2C &i2c,u16 maxUpdateFrequency=75);
+		HMC5883L(I2C &i2c,u16 maxUpdateFrequency=500);
 		#else
 		HMC5883L(I2C &i2c);
 		#endif
 		/////////////////////
 		///Initialization
 		/////////////////////
-		bool Init(bool wait=false);
+		virtual bool Init(bool wait=false);
 	
 		///////////////////////
 		///Status of HMC5883L
@@ -193,14 +194,14 @@ class HMC5883L:public Sensor
 		///@return if wait set to true,MOD_READY:update succed MOD_ERROR:update fail  MOD_BUSY:Update interval is too short
 		///        if wait set to false,MOD_ERROR:发送更新数据失败 MOD_READY:命令将会发送（具体的发送时间取决于队列中的排队的命令的数量）MOD_BUSY:Update interval is too short
 		/////////////////////
-		u8 Update(bool wait=false,Vector3<int> *mag=0);
+		virtual u8 Update(bool wait=false,Vector3<int> *mag=0);
 		
 		
 		///////////////////////
 		///Get magnetometer's raw data from memory 
 		///@retval magnetometer's raw data
 		///////////////////////
-		Vector3<int> GetDataRaw();
+		virtual Vector3<int> GetDataRaw();
 		
 		//////////////////////////////
 		///Get heading of magnetometer
@@ -212,7 +213,7 @@ class HMC5883L:public Sensor
 			////////////////////////////////
 		///获取两次更新值之间的时间间隔
 		////////////////////////////////
-		double GetUpdateInterval();
+		virtual double GetUpdateInterval();
 		
 };
 #endif

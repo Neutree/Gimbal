@@ -195,7 +195,7 @@ public:
 			// Reference direction of Earth's magnetic field
 			hx = 2.0f * (mx * (0.5f - q2q2 - q3q3) + my * (q1q2 - q0q3) + mz * (q1q3 + q0q2));
 			hy = 2.0f * (mx * (q1q2 + q0q3) + my * (0.5f - q1q1 - q3q3) + mz * (q2q3 - q0q1));
-				hz = 2.0f * mx * (q1q3 - q0q2) + 2.0f * my * (q2q3 + q0q1) + 2.0f * mz * (0.5f - q1q1 - q2q2);
+			hz = 2.0f * (mx * (q1q3 - q0q2) +  my * (q2q3 + q0q1) + mz * (0.5f - q1q1 - q2q2));
 			bx = sqrt(hx * hx + hy * hy);
 			bz = hz;
 		
@@ -208,6 +208,7 @@ public:
 			halfex += (my * halfwz - mz * halfwy);
 			halfey += (mz * halfwx - mx * halfwz);
 			halfez += (mx * halfwy - my * halfwx);
+			
 		}
 
 		//增加一个条件：  加速度的模量与G相差不远时。 0.75*G < normAcc < 1.25*G
@@ -233,6 +234,7 @@ public:
 			halfex += ay * halfvz - az * halfvy;
 			halfey += az * halfvx - ax * halfvz;
 			halfez += ax * halfvy - ay * halfvx;
+//			DEBUG_LOG<<"\t\t\t\t\t\t"<<halfex<<"\t"<<halfey<<"\t"<<halfez<<"\n";
 		}
 
 		// Apply feedback only when valid data has been gathered from the accelerometer or magnetometer
@@ -304,6 +306,24 @@ public:
 		mAngle.x = asin(-2 * q1 * q3 + 2 * q0* q2)* RtA; // pitch
 		mAngle.y = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* RtA; // roll
 		mAngle.z = atan2(2*(q0*q3+q1*q2),1-2*(q2*q2+q3*q3))* RtA;//yaw
+		return mAngle;
+	}
+	
+	Vector3f GetAngle(Vector3<int> acc, Vector3<float> gyro,Vector3<int> mag,float deltaT)
+	{
+//		DEBUG_LOG<<"\t\t\t\t"<<mag.x<<"\t"<<mag.y<<"\t"<<mag.z<<"\n";
+		NonlinearSO3AHRSupdate(gyro.x,gyro.y,gyro.z,acc.x,acc.y,acc.z,mag.x,mag.y,mag.z,30,0.08,deltaT);
+		
+//		mRotateMatrix((float)(q0q0 + q1q1 - q2q2 - q3q3),(float)(2.f * (q1*q2 + q0*q3)),       (float)(2.f * (q1*q3 - q0*q2)), 
+//						(float)(2.f * (q1*q2 - q0*q3)),  (float)(q0q0 - q1q1 + q2q2 - q3q3),   (float)(2.f * (q2*q3 + q0*q1)),
+//						(float)(2.f * (q1*q3 + q0*q2)),  (float)(2.f * (q2*q3 - q0*q1)),       (float)(q0q0 - q1q1 - q2q2 + q3q3));
+//		return mRotateMatrix.ToEuler();
+		
+		mAngle.x = asin(-2 * q1 * q3 + 2 * q0* q2)* RtA; // pitch
+		mAngle.y = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* RtA; // roll
+		mAngle.z = atan2(2*(q0*q3+q1*q2),1-2*(q2*q2+q3*q3))* RtA;//yaw
+		
+		
 		return mAngle;
 	}
 	

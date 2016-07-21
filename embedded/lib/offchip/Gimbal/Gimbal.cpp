@@ -2,7 +2,14 @@
 
 
 Gimbal::Gimbal(InertialSensor& ins,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc)
-:mIns(ins),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
+:mIns(ins),mMag(0),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
+{
+	mPIDRoll(5,0.2,0.6);
+	mPIDPitch(5,0.1,0.2);
+	mPIDYaw(5,0.1,0.1);
+}
+Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc)
+:mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
 {
 	mPIDRoll(5,0.2,0.6);
 	mPIDPitch(5,0.1,0.2);
@@ -29,6 +36,14 @@ bool Gimbal::UpdateIMU()
 		LOG("mpu6050 error\n\n\n");
 		return false;
 	}
+	if(mMag!=0)
+	{
+		if(MOD_ERROR == mMag->Update())
+		{
+			LOG("MAG error\n\n\n");
+			return false;
+		}
+	}
 	if(mIsCalibrating&&!mIns.IsGyroCalibrating())//角速度校准结束
 	{
 		mIsCalibrating = false;
@@ -39,8 +54,22 @@ bool Gimbal::UpdateIMU()
 	}
 	if(mIns.IsGyroCalibrated())//角速度已经校准了
 	{
+		Vector3<int> accRaw,magRaw;
+		Vector3f gyro;
+		accRaw = mIns.GetAccRaw();
+		gyro = mIns.GetGyr();
+		magRaw = mMag->GetDataRaw();
 		
-		mAngle = mAHRS_Algorithm.GetAngle(mIns.GetAccRaw(),mIns.GetGyr(),mIns.GetUpdateInterval());
+//		accRaw.x = -accRaw.y;
+//		accRaw.z = -accRaw.z;
+////		gyro.x = -gyro.x;
+////		gyro.y = -gyro.y;
+////		gyro.z = -gyro.z;
+//		magRaw.x = -magRaw.y;
+//		magRaw.z = -magRaw.z;
+		
+		mAngle = mAHRS_Algorithm.GetAngle(accRaw,gyro,magRaw,mIns.GetUpdateInterval());
+
 //		LOG(mAngle.x);
 //		LOG("\t");
 //		LOG(mAngle.y);
