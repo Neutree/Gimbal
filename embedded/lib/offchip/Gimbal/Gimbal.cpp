@@ -4,9 +4,9 @@
 Gimbal::Gimbal(InertialSensor& ins,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc)
 :mIns(ins),mMag(0),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
 {
-	mPIDRoll(5,0.2,0.6);
-	mPIDPitch(5,0.1,0.2);
-	mPIDYaw(5,0.1,0.1);
+	mPIDRoll(30,0.2,1.5);
+	mPIDPitch(5,0.1,0.3);
+	mPIDYaw(5,0.1,0.2);
 }
 Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc)
 :mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
@@ -48,51 +48,45 @@ bool Gimbal::UpdateIMU()
 	{
 		mIsCalibrating = false;
 		LOG("\ncalibrate complete\n");
-//		mMotorRoll.Enable();
-//		mMotorPitch.Enable();
-//		mMotorYaw.Enable();
+		mMotorRoll.Enable();
+		mMotorPitch.Enable();
+		mMotorYaw.Enable();
 	}
 	if(mIns.IsGyroCalibrated())//角速度已经校准了
-	{
-		Vector3<int> accRaw,magRaw;
-		Vector3f gyro;
-		accRaw = mIns.GetAccRaw();
-		gyro = mIns.GetGyr();
-		magRaw = mMag->GetDataRaw();
-		
-//		accRaw.x = -accRaw.y;
-//		accRaw.z = -accRaw.z;
-////		gyro.x = -gyro.x;
-////		gyro.y = -gyro.y;
-////		gyro.z = -gyro.z;
-//		magRaw.x = -magRaw.y;
-//		magRaw.z = -magRaw.z;
-		
-		mAngle = mAHRS_Algorithm.GetAngle(accRaw,gyro,magRaw,mIns.GetUpdateInterval());
+	{		
+		mAngle = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(), mMag->GetDataRaw(),mIns.GetUpdateInterval());
 
-//		LOG(mAngle.x);
-//		LOG("\t");
-//		LOG(mAngle.y);
-//		LOG("\t");
-//		LOG(mAngle.z);
-//		LOG("\t");
+		//根据传感器安装方位进行换向
+		mAngle.z = -mAngle.z;
+		mAngle.y>0?(mAngle.y-=180):(mAngle.y+=180);
+		mAngle.y = -mAngle.y;
+		mAngle.z>0?(mAngle.z-=180):(mAngle.z+=180);
+		
+		//转换为弧度
+		mAngle.x*=AtR;
+		mAngle.y*=AtR;
+		mAngle.z*=AtR;
 	}
 	return true;
 }
-bool Gimbal::UpdateMotor()
+bool Gimbal::UpdateMotor(int* motorRoll,int* motorPitch, int* motorYaw)
 {
-	int v = mPIDRoll.Controll(0,mAngle.x);
-	int v2 = mPIDPitch.Controll(0,mAngle.y);
+	int v = mPIDRoll.Controll(0,mAngle.y);
+	int v2 = mPIDPitch.Controll(0,mAngle.x);
 	int v3 = mPIDYaw.Controll(0,mAngle.z);
+
+	v2=-v2;
+	v3 = -v3;
 	mMotorRoll.SetPosition(v);
-//	LOG(v);
-//	LOG("\n");
 	mMotorPitch.SetPosition(v2);
-//	LOG(v2);
-//	LOG("\n");	
-	mMotorYaw.SetPosition(-v3);
-//	LOG(-v3);
-//	LOG("\n");	
+	mMotorYaw.SetPosition(v3);
+	
+	if(motorRoll!=0)
+		*motorRoll = v;
+	if(motorPitch!=0)
+		*motorPitch = v2;
+	if(motorYaw!=0)
+		*motorYaw = v3;
 	return true;
 }
 float Gimbal::UpdateVoltage(uint8_t channelNumber,float resister_a,float resister_b,float fullRange)

@@ -63,6 +63,18 @@ public:
 	{
 		return mKd;
 	}
+	void SetKp(float value)
+	{
+		mKp = value;
+	}
+	void SetKi(float value)
+	{
+		mKi = value;
+	}
+	void SetKd(float value)
+	{
+		mKd = value;
+	}
 };
 
 #endif

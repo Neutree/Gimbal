@@ -33,7 +33,7 @@ public:
 	Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc);
 	bool Init();
 	bool UpdateIMU();
-	bool UpdateMotor();
+	bool UpdateMotor(int* motorRoll = 0,int* motorPitch = 0, int* motorYaw = 0);
 	float UpdateVoltage(uint8_t channelNumber,float resister_a,float resister_b,float fullRange);
 	bool IsCalibrated();
 	bool IsCalibrating();
