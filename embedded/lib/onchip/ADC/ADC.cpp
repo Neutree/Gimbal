@@ -118,7 +118,7 @@ double ADC::operator[](u8 chNum)
 float ADC::Voltage_I(uint8_t channelNumber,float resister_a,float resister_b,float fullRange)
 {
 	static float voltage = fullRange;
-	voltage += 0.002*((*this)[channelNumber]*((resister_a+resister_b)*1.0/resister_b) - voltage);
+	voltage += 0.012*((*this)[channelNumber]*((resister_a+resister_b)*1.0/resister_b) - voltage);
 	return voltage;
 }
 

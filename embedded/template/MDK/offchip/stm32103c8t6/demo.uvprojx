@@ -526,6 +526,11 @@
               <FileType>8</FileType>
               <FilePath>.\app\UserInterrupt.cpp</FilePath>
             </File>
+            <File>
+              <FileName>Communicate.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\app\Communicate.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
