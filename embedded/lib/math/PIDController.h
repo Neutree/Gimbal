@@ -4,9 +4,7 @@
 class PIDController
 {
 private:
-	float mKp;
-	float mKi;
-	float mKd;
+
 
 	float _Perr;
 	float _Ierr;
@@ -51,18 +49,18 @@ public:
 	{
 		mKd+=value;
 	}
-	float GetKp()
-	{
-		return mKp;
-	}
-	float GetKi()
-	{
-		return mKi;
-	}
-	float GetKd()
-	{
-		return mKd;
-	}
+//	float GetKp()
+//	{
+//		return mKp;
+//	}
+//	float GetKi()
+//	{
+//		return mKi;
+//	}
+//	float GetKd()
+//	{
+//		return mKd;
+//	}
 	void SetKp(float value)
 	{
 		mKp = value;
@@ -75,6 +73,11 @@ public:
 	{
 		mKd = value;
 	}
+	
+public:
+	float mKp;
+	float mKi;
+	float mKd;
 };
 
 #endif

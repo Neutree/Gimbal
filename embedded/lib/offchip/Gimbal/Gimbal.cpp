@@ -1,19 +1,10 @@
 #include "Gimbal.h"
 
 
-Gimbal::Gimbal(InertialSensor& ins,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc)
-:mIns(ins),mMag(0),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
+Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,flash& flash_)
+:mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mFlash(flash_),mIsCalibrating(false)
 {
-	mPIDRoll(30,0.2,1.5);
-	mPIDPitch(5,0.1,0.3);
-	mPIDYaw(5,0.1,0.2);
-}
-Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc)
-:mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mIsCalibrating(false)
-{
-	mPIDRoll(5,0.2,0.6);
-	mPIDPitch(5,0.1,0.2);
-	mPIDYaw(5,0.1,0.1);
+
 }
 bool Gimbal::Init()
 {
@@ -48,6 +39,13 @@ bool Gimbal::UpdateIMU()
 	{
 		mIsCalibrating = false;
 		LOG("\ncalibrate complete\n");
+		if(!ReadPIDParam2Flash())
+		{
+			mPIDRoll(5,0.2,0.6);
+			mPIDPitch(5,0.1,0.2);
+			mPIDYaw(5,0.1,0.1);
+			SavePIDParam2Flash();
+		}
 		mMotorRoll.Enable();
 		mMotorPitch.Enable();
 		mMotorYaw.Enable();
@@ -100,5 +98,48 @@ bool Gimbal::IsCalibrated()
 bool Gimbal::IsCalibrating()
 {
 	return mIsCalibrating;
+}
+
+bool Gimbal::SavePIDParam2Flash()
+{
+	u16 data[11];
+	data[0] = 0x00aa;
+	data[1] = 0x00bb;
+	data[2] = mPIDRoll.mKp*1000;
+	data[3] = mPIDRoll.mKi*1000;
+	data[4] = mPIDRoll.mKd*1000;
+	data[5] = mPIDPitch.mKp*1000;
+	data[6] = mPIDPitch.mKi*1000;
+	data[7] = mPIDPitch.mKd*1000;
+	data[8] = mPIDYaw.mKp*1000;
+	data[9] = mPIDYaw.mKi*1000;
+	data[10] = mPIDYaw.mKd*1000;
+
+	
+	
+	mFlash.Clear(0);
+	if(!mFlash.Write(0,0,data,11))
+		return false;
+	ReadPIDParam2Flash();
+	return true;
+}
+
+bool Gimbal::ReadPIDParam2Flash()
+{
+	u16 data[11];
+	if(!mFlash.Read(0,0,data,11))
+		return false;
+	if(data[0]!=0x00aa || data[1]!=0x00bb)
+		return false;
+	mPIDRoll.SetKp(data[2]/1000.0);
+	mPIDRoll.SetKi(data[3]/1000.0);
+	mPIDRoll.SetKd(data[4]/1000.0);
+	mPIDPitch.SetKp(data[5]/1000.0);
+	mPIDPitch.SetKi(data[6]/1000.0);
+	mPIDPitch.SetKd(data[7]/1000.0);
+	mPIDYaw.SetKp(data[8]/1000.0);
+	mPIDYaw.SetKi(data[9]/1000.0);
+	mPIDYaw.SetKd(data[10]/1000.0);
+	return true;
 }
 

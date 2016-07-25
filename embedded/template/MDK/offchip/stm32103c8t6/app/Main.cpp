@@ -13,6 +13,7 @@
 #include "mpu6050.h"
 #include "HMC5883L.h"
 #include "BLDCMotor.h"
+#include "Flash.h"
 
 
 #include "Communicate.h"
@@ -29,7 +30,7 @@ PWM pwm4(TIM4,1,1,1,0,20000);  //开启时钟4的3个通道，频率2Whz
 //InputCapture_TIM t4(TIM4, 400, true, true, true, true);
 //InputCapture_EXIT ch1(GPIOB,6);
 ADC voltage(4); //读取电压值
-//flash InfoStore(0x08000000+100*MEMORY_PAGE_SIZE,true);     //flash
+flash infoStore(0x08000000+63*MEMORY_PAGE_SIZE,true);     //flash
 
 //LED
 GPIO ledRedGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);//LED GPIO
@@ -48,7 +49,7 @@ BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.55);   //yaw motor
 
 /*************************全局变量*****************************************/
 
-Gimbal gimbal(mpu6050,mag,motorRoll,motorPitch,motorYaw,voltage);
+Gimbal gimbal(mpu6050,mag,motorRoll,motorPitch,motorYaw,voltage,infoStore);
 
 Communicate communicate(com);
 
@@ -88,14 +89,14 @@ void loop()
 	ledBlue.Blink(0,0.5,false);
 	
 	//更新姿态、控制电机，500Hz
-	if(tskmgr.TimeSlice(record_tmgTest,0.002)) //每0.002秒执行一次
+	if(tskmgr.TimeSlice(record_tmgTest,0.01)) //每0.01秒执行一次
 	{
 		gimbal.UpdateIMU();//更新姿态
 		gimbal.UpdateMotor(&motorValueRoll,&motorValuePitch,&motorValueYaw);//控制电机
 	}
 	
 	//输出电源值和飞机姿态数据、电机数据。10Hz
-	if(tskmgr.TimeSlice(record_tmgTest2,0.1)) 
+	if(tskmgr.TimeSlice(record_tmgTest2,0.08)) 
 	{
 		if(gimbal.IsCalibrated())
 		{
@@ -117,7 +118,7 @@ void loop()
 int main()
 {
 	TaskManager::DelayS(2);
-	init();
+	init();	
 	while(1)
 	{
 		loop();

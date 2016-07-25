@@ -197,17 +197,17 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 
 	if(*(data_buf+2)==0X10)								//PID1
     {
-        data.mPIDRoll.SetKd( 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) ));
+        data.mPIDRoll.SetKp( 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) ));
         data.mPIDRoll.SetKi(  0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) ));
         data.mPIDRoll.SetKd(  0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) ));
-        data.mPIDPitch.SetKd( 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ));
+        data.mPIDPitch.SetKp( 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ));
         data.mPIDPitch.SetKi( 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) ));
         data.mPIDPitch.SetKd( 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) ));
-        data.mPIDYaw.SetKd( 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) ));
+        data.mPIDYaw.SetKp( 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) ));
         data.mPIDYaw.SetKi( 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) ));
         data.mPIDYaw.SetKd( 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) ));
         ANO_DT_Send_Check(*(data_buf+2),sum);
-//				Param_SavePID();
+		data.SavePIDParam2Flash();
     }
     if(*(data_buf+2)==0X11)								//PID2
     {
