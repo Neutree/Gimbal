@@ -46,6 +46,9 @@ bool Gimbal::UpdateIMU()
 			mPIDYaw(5,0.1,0.1);
 			SavePIDParam2Flash();
 		}
+		//校准磁力计
+		mMag->Calibrate(10);
+
 		mMotorRoll.Enable();
 		mMotorPitch.Enable();
 		mMotorYaw.Enable();

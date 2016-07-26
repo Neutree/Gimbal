@@ -31,6 +31,8 @@ public:
 	////////////////////////////////
 	virtual double GetUpdateInterval() = 0;
 	
+	//三轴校准函数，调用之后，拿着你的小飞机绕八字，传入的参数是当你每个轴都到达峰值而不在更新，这个时间之后就退出校准
+	virtual bool Calibrate(double SpendTime)=0;
 		
 };
 		
