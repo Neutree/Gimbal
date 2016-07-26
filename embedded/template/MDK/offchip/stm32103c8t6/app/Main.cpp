@@ -67,11 +67,7 @@ void init()
 	
 	gimbal.Init();
 	
-	//测试磁力计是否存在
-	if(!mag.TestConnection(false))
-		com<<"mag connection error\n";
-	//初始化磁力计
-	mag.Init();
+	
 	
 }
 
@@ -83,7 +79,7 @@ int motorValueRoll,motorValuePitch,motorValueYaw;
   */
 void loop()
 {
-	static double record_tmgTest=0,record_tmgTest2 = 0; //taskmanager时间 测试
+	static double record_tmgTest=0,record_tmgTest2 = 0,record_tmgTest3=0; //taskmanager时间 测试
 	
 	//系统运行指示灯，1s闪烁一次
 	ledBlue.Blink(0,0.5,false);
@@ -108,6 +104,14 @@ void loop()
 		}
 		else if(gimbal.IsCalibrating())
 			LOG("..");
+	}
+	
+	if(tskmgr.TimeSlice(record_tmgTest3,1)) 
+	{
+		if(gimbal.IsCalibrated())
+		{
+			communicate.ANO_DT_Send_Power(gimbal.UpdateVoltage(4,5.1,1,12)*100,0);
+		}
 	}
 	
 	//处理来自地面站的消息

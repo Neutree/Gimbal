@@ -13,6 +13,10 @@ bool Gimbal::Init()
 	mMotorPitch.Disable();
 	mMotorYaw.Disable();
 	mIns.Init();
+	//初始化磁力计
+	if(!mMag->Init())
+		LOG("magnetometer error!!!!\n");
+	
 	while(TaskManager::Time()-time<1.5)
 	{}
 	mIns.StartGyroCalibrate();//启动校准

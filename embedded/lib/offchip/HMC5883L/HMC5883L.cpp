@@ -8,20 +8,23 @@ HMC5883L::HMC5883L(I2C &i2c,u16 maxUpdateFrequency)
 {
 	mI2C=&i2c;
 	mMaxUpdateFrequency=maxUpdateFrequency;
-	this->Init();
+	//this->Init();
 }
 #else
 HMC5883L::HMC5883L(I2C &i2c)
 {
 	mI2C=&i2c;
-	this->Init();
+	//this->Init();
 }
 #endif
 bool HMC5883L::Init(bool wait)
 {
 	if(wait)
 		mI2C->WaitTransmitComplete();
-		
+	//测试磁力计是否存在
+	if(!TestConnection(false))
+		DEBUG_LOG<<"mag connection error\n";
+	
 	unsigned char IIC_Write_Temp;
 	IIC_Write_Temp = HMC5883L_AVERAGING_8 | HMC5883L_RATE_75 | HMC5883L_BIAS_NORMAL;   
 	mI2C->AddCommand(HMC5883_ADDRESS,HMC5883_Config_RA,&IIC_Write_Temp,1,0,0); //Config Register A  :number of samples averaged->8  Data Output rate->30Hz
