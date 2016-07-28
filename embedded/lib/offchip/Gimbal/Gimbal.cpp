@@ -21,13 +21,11 @@ bool Gimbal::Init()
 		mPIDPitch(5,0.1,0.2);
 		mPIDYaw(5,0.1,0.1);
 		mIns.SetGyrOffset(0,0,0);
-		mMag->SetOffsetRatio(1,1,1);
-		mMag->SetOffsetBias(0,0,0);	
+		mMag->SetOffsetRatio(1.285,1.285,1);
+		mMag->SetOffsetBias(236,309,114);
 		//保存信息到flash
 		SaveParam2Flash();
-	
 	}
-
 	mMotorRoll.Enable();
 	mMotorPitch.Enable();
 	mMotorYaw.Enable();
@@ -135,7 +133,7 @@ void Gimbal::StartGyroCalibrate()
 				return ;
 			}
 		}
-		TaskManager::DelayMs(10);
+		TaskManager::DelayMs(100);
 	}	
 	mIns.StartGyroCalibrate();//启动校准
 	mIsGyroCalibrating = true;
@@ -170,15 +168,15 @@ bool Gimbal::SaveParam2Flash()
 	data[8] = mPIDYaw.mKp*1000;
 	data[9] = mPIDYaw.mKi*1000;
 	data[10] = mPIDYaw.mKd*1000;
-	data[11] = mIns.GetGyrOffset().x;
-	data[12] = mIns.GetGyrOffset().y;
-	data[13] = mIns.GetGyrOffset().z;
-	data[14] = mMag->GetOffsetRatio().x*1000;
-	data[15] = mMag->GetOffsetRatio().y*1000;
-	data[16] = mMag->GetOffsetRatio().z*1000;
-	data[17] = mMag->GetOffsetBias().x*1000;
-	data[18] = mMag->GetOffsetBias().y*1000;
-	data[19] = mMag->GetOffsetBias().z*1000;
+	data[11] = mIns.GetGyrOffset().x+32768;
+	data[12] = mIns.GetGyrOffset().y+32768;
+	data[13] = mIns.GetGyrOffset().z+32768;
+	data[14] = mMag->GetOffsetRatio().x*10000;
+	data[15] = mMag->GetOffsetRatio().y*10000;
+	data[16] = mMag->GetOffsetRatio().z*10000;
+	data[17] = mMag->GetOffsetBias().x+32768;
+	data[18] = mMag->GetOffsetBias().y+32768;
+	data[19] = mMag->GetOffsetBias().z+32768;
 	mFlash.Clear(0);
 	if(!mFlash.Write(0,0,data,20))
 		return false;
@@ -214,9 +212,9 @@ bool Gimbal::ReadGyroOffset2Flash()
 	if(!mFlash.Read(0,11,data,3))
 		return false;
 	Vector3<int> gyroOffset;
-	gyroOffset.x = data[0];
-	gyroOffset.y = data[1];
-	gyroOffset.z = data[2];
+	gyroOffset.x = data[0]-32768;
+	gyroOffset.y = data[1]-32768;
+	gyroOffset.z = data[2]-32768;
 	mIns.SetGyrOffset(gyroOffset.x,gyroOffset.y,gyroOffset.z); 
 	return true;
 }
@@ -231,12 +229,12 @@ bool Gimbal::ReadMagOffset2Flash()
 	if(!mFlash.Read(0,14,data,6))
 		return false;
 	Vector3f magOffsetRatio,magOffsetBias;
-	magOffsetRatio.x = data[0]/1000.0;
-	magOffsetRatio.y = data[1]/1000.0;
-	magOffsetRatio.z = data[2]/1000.0;
-	magOffsetBias.x = data[3]/1000.0;
-	magOffsetBias.y = data[4]/1000.0;
-	magOffsetBias.z = data[5]/1000.0;
+	magOffsetRatio.x = data[0]/10000.0;
+	magOffsetRatio.y = data[1]/10000.0;
+	magOffsetRatio.z = data[2]/10000.0;
+	magOffsetBias.x = data[3]-32768;
+	magOffsetBias.y = data[4]-32768;
+	magOffsetBias.z = data[5]-32768;
 	mMag->SetOffsetRatio(magOffsetRatio.x,magOffsetRatio.y,magOffsetRatio.z); 
 	mMag->SetOffsetBias(magOffsetBias.x,magOffsetBias.y,magOffsetBias.z);
 	return true;
@@ -259,17 +257,17 @@ bool Gimbal::ReadParam2Flash()
 	mPIDYaw.SetKi(data[9]/1000.0);
 	mPIDYaw.SetKd(data[10]/1000.0);
 	Vector3<int> gyroOffset;
-	gyroOffset.x = data[11];
-	gyroOffset.y = data[12];
-	gyroOffset.z = data[13];
+	gyroOffset.x = data[11]-32768;
+	gyroOffset.y = data[12]-32768;
+	gyroOffset.z = data[13]-32768;
 	mIns.SetGyrOffset(gyroOffset.x,gyroOffset.y,gyroOffset.z); 
 	Vector3f magOffsetRatio,magOffsetBias;
-	magOffsetRatio.x = data[14]/1000.0;
-	magOffsetRatio.y = data[15]/1000.0;
-	magOffsetRatio.z = data[16]/1000.0;
-	magOffsetBias.x = data[17]/1000.0;
-	magOffsetBias.y = data[18]/1000.0;
-	magOffsetBias.z = data[19]/1000.0;
+	magOffsetRatio.x = data[14]/10000.0;
+	magOffsetRatio.y = data[15]/10000.0;
+	magOffsetRatio.z = data[16]/10000.0;
+	magOffsetBias.x = data[17]-32768;
+	magOffsetBias.y = data[18]-32768;
+	magOffsetBias.z = data[19]-32768;
 	mMag->SetOffsetRatio(magOffsetRatio.x,magOffsetRatio.y,magOffsetRatio.z); 
 	mMag->SetOffsetBias(magOffsetBias.x,magOffsetBias.y,magOffsetBias.z);
 	return true;
