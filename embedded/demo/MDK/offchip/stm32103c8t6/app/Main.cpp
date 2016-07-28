@@ -51,7 +51,7 @@ BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.55);   //yaw motor
 
 Gimbal gimbal(mpu6050,mag,motorRoll,motorPitch,motorYaw,voltage,infoStore);
 
-Communicate communicate(com);
+Communicate communicate(gimbal,com);
 
 /**************************************************************************/
 
@@ -64,11 +64,7 @@ void init()
 {
 	ledBlue.On();
 	ledRed.Off();
-	
 	gimbal.Init();
-	
-	
-	
 }
 
 int motorValueRoll,motorValuePitch,motorValueYaw;
@@ -94,21 +90,26 @@ void loop()
 	//输出电源值和飞机姿态数据、电机数据。10Hz
 	if(tskmgr.TimeSlice(record_tmgTest2,0.08)) 
 	{
-		if(gimbal.IsCalibrated())
-		{
+//		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
+//		{
 			ledRed.Toggle();
-			
-			communicate.ANO_DT_Send_Status(gimbal.mAngle.y*RtA,gimbal.mAngle.x*RtA,gimbal.mAngle.z*RtA,0,0,0);
-			communicate.ANO_DT_Send_MotoPWM(motorValueRoll%256,motorValuePitch%256,motorValueYaw%256,0,0,0,0,0);
+			communicate.ANO_DT_Send_Status(gimbal.mAngle.y*RtA,gimbal.mAngle.x*RtA,gimbal.mAngle.z*RtA,0,1,gimbal.mIsArmed);
+			communicate.ANO_DT_Send_MotoPWM(motorValueRoll%256+256,motorValuePitch%256+256,motorValueYaw%256+256,0,0,0,0,0);
 			communicate.ANO_DT_Send_Power(gimbal.UpdateVoltage(4,5.1,1,12)*100,0);
-		}
-		else if(gimbal.IsCalibrating())
-			LOG("..");
+			if(!gimbal.IsMagCalibrated())
+				communicate.ANO_DT_Send_Senser(mpu6050.GetAcc().x*1000,mpu6050.GetAcc().y*1000,mpu6050.GetAcc().z*1000,mpu6050.GetGyrRaw().x,mpu6050.GetGyrRaw().y,mpu6050.GetGyrRaw().z,mag.xMaxMinusMin,mag.yMaxMinusMin,mag.zMaxMinusMin,0);
+			else
+				communicate.ANO_DT_Send_Senser(mpu6050.GetAcc().x*1000,mpu6050.GetAcc().y*1000,mpu6050.GetAcc().z*1000,mpu6050.GetGyrRaw().x,mpu6050.GetGyrRaw().y,mpu6050.GetGyrRaw().z,mag.GetDataRaw().x,mag.GetDataRaw().y,mag.GetDataRaw().z,0);
+			communicate.ANO_DT_Send_RCData(0,(gimbal.mTargetAngle.z+180)*2.77778+1000,(gimbal.mTargetAngle.y+180)*2.77778+1000,(gimbal.mTargetAngle.x+180)*2.77778+1000,0,0,0,0,0,0);
+//			com<<mpu6050.GetGyrRaw().z<<"\n";
+//		}
+//		else if(gimbal.IsGyroCalibrating()||gimbal.IsMagCalibrating())
+//			LOG("..");
 	}
 	
 	if(tskmgr.TimeSlice(record_tmgTest3,1)) 
 	{
-		if(gimbal.IsCalibrated())
+		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
 		{
 			communicate.ANO_DT_Send_Power(gimbal.UpdateVoltage(4,5.1,1,12)*100,0);
 		}
@@ -121,7 +122,7 @@ void loop()
 
 int main()
 {
-	TaskManager::DelayS(2);
+	TaskManager::DelayMs(500);//延时，等待传感器上电自启动完毕
 	init();	
 	while(1)
 	{

@@ -56,11 +56,13 @@ mpu6050::mpu6050(I2C &i2c,u16 maxUpdateFrequency)
 {
 	mI2C=&i2c;
 	mMaxUpdateFrequency=maxUpdateFrequency;
+	mIsGyrCalibrated = true;
 }
 #else
 mpu6050::mpu6050(I2C &i2c)
 {
 	mI2C=&i2c;
+	mIsGyrCalibrated = true;
 }
 #endif
 
@@ -195,7 +197,7 @@ u8 mpu6050::Update(bool wait,Vector3<int> *acc, Vector3<int> *gyro)
 			gyroCalibrateCnt = 0;
 			mIsGyrCalibrated = true;
 		}	
-	}	
+	}
 	mGyroRaw -= mGyroOffset;
 	
 	return MOD_READY;
@@ -207,6 +209,7 @@ u8 mpu6050::Update(bool wait,Vector3<int> *acc, Vector3<int> *gyro)
 void mpu6050::StartGyroCalibrate()
 {
 	mIsGyrCalibrating = true;
+	mIsGyrCalibrated = false;
 }
 
 ////////////////////////
@@ -216,6 +219,7 @@ void mpu6050::StartGyroCalibrate()
 void mpu6050::StopGyroCalibrate()
 {
 	mIsGyrCalibrating = false;
+	mIsGyrCalibrated = true;
 }
 ////////////////////
 ///是否正在校准角速度
@@ -232,7 +236,14 @@ Vector3<int> mpu6050::GetGyrOffset()
 {
 	return mGyroOffset;	
 }
-
+///////////////////////////
+///角速度校准值
+//////////////////////////
+void mpu6050::SetGyrOffset(int x, int y ,int z)
+{
+	Vector3<int> offset(x,y,z);
+	mGyroOffset = offset;
+}
 
 ///////////////////////////////////
 ///检测mpu6050状态

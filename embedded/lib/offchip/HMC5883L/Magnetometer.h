@@ -32,8 +32,21 @@ public:
 	virtual double GetUpdateInterval() = 0;
 	
 	//三轴校准函数，调用之后，拿着你的小飞机绕八字，传入的参数是当你每个轴都到达峰值而不在更新，这个时间之后就退出校准
-	virtual bool Calibrate(double SpendTime)=0;
+	virtual bool StartCalibrate()=0;
+	
+	virtual bool IsCalibrated()=0;
 		
+	//获取磁力计校准的偏置
+	virtual Vector3f GetOffsetBias() = 0;
+	
+	//获取磁力计校准的比例
+	virtual Vector3f GetOffsetRatio() = 0;
+	
+		//获取磁力计校准的偏置
+	virtual void SetOffsetBias(float x,float y,float z) = 0;
+	
+	//获取磁力计校准的比例
+	virtual void SetOffsetRatio(float x,float y,float z) = 0;
 };
 		
 		

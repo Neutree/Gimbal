@@ -8,12 +8,18 @@ HMC5883L::HMC5883L(I2C &i2c,u16 maxUpdateFrequency)
 {
 	mI2C=&i2c;
 	mMaxUpdateFrequency=maxUpdateFrequency;
+	mIsCalibrated = true;
+	mOffsetRatio(1,1,1);
+	mOffsetBias(0,0,0);
 	//this->Init();
 }
 #else
 HMC5883L::HMC5883L(I2C &i2c)
 {
 	mI2C=&i2c;
+	mIsCalibrated = true;
+	mOffsetRatio(1,1,1);
+	mOffsetRatio(0,0,0);
 	//this->Init();
 }
 #endif
@@ -45,9 +51,6 @@ bool HMC5883L::Init(bool wait)
 			this->mHealth=1;
 	}
 	
-	//设置校准的比例系数和常数
-	SetCalibrateRatioBias(1.02,1,1.09,213.76,-201.5,125.16);
-	mIsCalibrate = false; 
 	return true;
 }
 
@@ -184,6 +187,78 @@ u8 HMC5883L::Update(bool wait,Vector3<int> *mag)
 			this->Init(wait);
 			return false;
 		}
+	//校准
+	if(!mIsCalibrated)
+	{
+		static int limitValue[6]={0,0,0,0,0,0};//三个轴的极限值（最小最大值）
+		static bool firstTime=true;
+		static float lastUpdateLimitValueTime = 0;//记录最近更新最大最小值的时间
+		int magRaw[3];
+		magRaw[0] = GetNoCalibrateDataRaw().x;
+		magRaw[1] = GetNoCalibrateDataRaw().y;
+		magRaw[2] = GetNoCalibrateDataRaw().z;//原始值
+		if(firstTime)//刚开始校准,给初值
+		{
+			firstTime = false;
+			lastUpdateLimitValueTime = TaskManager::Time();
+			for(u8 i=0;i<3;++i)
+			{
+				limitValue[2*i] = magRaw[i];
+				limitValue[2*i+1] = magRaw[i];
+			}
+		}
+		else
+		{
+			for(u8 i=0;i<3;++i)
+			{
+				if(magRaw[i]<limitValue[2*i])
+				{
+					limitValue[2*i] = magRaw[i];
+					lastUpdateLimitValueTime = TaskManager::Time();
+				}
+				else if(magRaw[i]>limitValue[2*i+1])
+				{
+					limitValue[2*i+1] = magRaw[i];
+					lastUpdateLimitValueTime = TaskManager::Time();
+				}
+			}
+			//三个轴的区间
+			xMaxMinusMin = limitValue[1] -limitValue[0];
+			yMaxMinusMin = limitValue[3] -limitValue[2];
+			zMaxMinusMin = limitValue[5] -limitValue[4];
+			if(TaskManager::Time() - lastUpdateLimitValueTime > 10)//10秒钟保持极限值不变，停止校准
+			{
+				if(xMaxMinusMin>yMaxMinusMin && xMaxMinusMin>zMaxMinusMin)
+				{
+					mOffsetRatio.x = 1.0;
+					mOffsetRatio.y = 1.0*xMaxMinusMin/yMaxMinusMin;
+					mOffsetRatio.z = 1.0*xMaxMinusMin/zMaxMinusMin;
+				}
+				else if(yMaxMinusMin>xMaxMinusMin && yMaxMinusMin>zMaxMinusMin)
+				{
+					mOffsetRatio.x = 1.0*yMaxMinusMin/xMaxMinusMin;
+					mOffsetRatio.y = 1.0;
+					mOffsetRatio.z = 1.0*yMaxMinusMin/zMaxMinusMin;
+				}
+				else if(zMaxMinusMin>xMaxMinusMin && zMaxMinusMin>yMaxMinusMin)
+				{
+					mOffsetRatio.x = 1.0*xMaxMinusMin/yMaxMinusMin;
+					mOffsetRatio.y = 1.0*xMaxMinusMin/yMaxMinusMin;
+					mOffsetRatio.z = 1.0;
+				}
+				mOffsetBias.x = mOffsetRatio.x*(xMaxMinusMin*0.5f - limitValue[1]);
+				mOffsetBias.y = mOffsetRatio.y*(yMaxMinusMin*0.5f - limitValue[3]);
+				mOffsetBias.z = mOffsetRatio.z*(zMaxMinusMin*0.5f - limitValue[5]);
+				//检查校准值有效性
+				{
+					//未写
+				}
+				//标志复位
+				firstTime = true;
+				mIsCalibrated = true;
+			}
+		}
+	}
 	return true;
 }
 
@@ -191,9 +266,9 @@ u8 HMC5883L::Update(bool wait,Vector3<int> *mag)
 Vector3<int>  HMC5883L::GetDataRaw()
 {
 	Vector3<int> temp;
-	temp.x= mRatioX *(((signed short int)(mData.mag_XH<<8)) | mData.mag_XL) +mBiasX;
-	temp.y= mRatioY *(((signed short int)(mData.mag_YH<<8)) | mData.mag_YL) +mBiasY;
-	temp.z= mRatioZ *(((signed short int)(mData.mag_ZH<<8)) | mData.mag_ZL) +mBiasZ;
+	temp.x= mOffsetRatio.x *(((signed short int)(mData.mag_XH<<8)) | mData.mag_XL) +mOffsetBias.x;
+	temp.y= mOffsetRatio.y *(((signed short int)(mData.mag_YH<<8)) | mData.mag_YL) +mOffsetBias.y;
+	temp.z= mOffsetRatio.z *(((signed short int)(mData.mag_ZH<<8)) | mData.mag_ZL) +mOffsetBias.z;
 	return temp;
 }
 
@@ -236,185 +311,40 @@ double HMC5883L::GetUpdateInterval()
 	return Interval();
 }
 
-bool HMC5883L::SetCalibrateRatioBias(float RatioX,float RatioY,float BiasX,float BiasY)
-{
-		mRatioX=RatioX;
-		mRatioY=RatioY;
-		mRatioZ=1;
-		mBiasX=BiasX;
-		mBiasY=BiasY;
-		mBiasZ=0;
-	return true;
-}
 
-bool HMC5883L::SetCalibrateRatioBias(float RatioX,float RatioY,float RatioZ,float BiasX,float BiasY,float BiasZ)
-{
-		mRatioX=RatioX;
-		mRatioY=RatioY;
-		mRatioZ=RatioZ;
-		mBiasX=BiasX;
-		mBiasY=BiasY;
-		mBiasZ=BiasZ;
-	return true;
-}
 
-bool HMC5883L::Calibrate(double SpendTime)
+bool HMC5883L::StartCalibrate()
 {
-		int DataSize[6]={0}; //用于存放XYZ轴的最大最小值 顺序 Xmin Xmax Ymin Ymax Zmin Zmax
-		int NowData[3];
-		int OldData[3];
-		double TempTime=0;
-		double UpdataTime=0;
-	
-		while(1)
-		{
-			if(tskmgr.TimeSlice(UpdataTime,0.01))
-			{
-				if(Update()!=MOD_ERROR)
-				{
-					NowData[0]=GetNoCalibrateDataRaw().x;
-					NowData[1]=GetNoCalibrateDataRaw().y;
-					NowData[2]=GetNoCalibrateDataRaw().z;
-					
-				if(DataSize[0] == 0) //赋初值
-				{
-					TempTime = tskmgr.Time();
-					DataSize[0] = NowData[0];
-					DataSize[1] = NowData[0];
-				
-					DataSize[2] = NowData[1];
-					DataSize[3] = NowData[1];
-				
-					DataSize[4] = NowData[2];
-					DataSize[5] = NowData[2];
-				}
-				
-			if(NowData[0]!=OldData[0] || NowData[1]!=OldData[1] || NowData[2]!=OldData[2])
-				{
-					
-				//更新X轴尺寸
-				if(NowData[0] > DataSize[1])
-				{
-					DataSize[1] = NowData[0];
-					TempTime = tskmgr.Time();
-				}
-				if(NowData[0] < DataSize[0])
-				{
-					DataSize[0] = NowData[0];
-					TempTime = tskmgr.Time();
-				}
-				
-				//更新Y轴尺寸
-				if(NowData[1] > DataSize[3])
-				{
-					DataSize[3] = NowData[1];
-					TempTime = tskmgr.Time();
-				}
-				if(NowData[1] < DataSize[2])
-				{
-					DataSize[2] = NowData[1];
-					TempTime = tskmgr.Time();
-				}
-				
-				//更新Z轴尺寸
-				if(NowData[2] > DataSize[5])
-				{
-					DataSize[5] = NowData[2];
-					TempTime = tskmgr.Time();
-				}
-				if(NowData[2] < DataSize[4])
-				{
-					DataSize[4] = NowData[2];
-					TempTime = tskmgr.Time();
-				}
-				
-				LOG(DataSize[0]);
-				LOG("\t");
-				LOG(DataSize[1]);
-				LOG("\t");
-				LOG(DataSize[2]);
-				LOG("\t");
-				LOG(DataSize[3]);
-				LOG("\t");
-				LOG(DataSize[4]);
-				LOG("\t");		
-				LOG(DataSize[5]);				
-				LOG("\n");
-				
-				}
-				
-				if(tskmgr.Time() - TempTime >=SpendTime)
-				{
-						//开始计算比例和偏移
-						int X_MaxCutMin = DataSize[1] - DataSize[0];
-						int Y_MaxCutMin = DataSize[3] - DataSize[2];
-						int Z_MaxCutMin = DataSize[5] = DataSize[4];
-					  
-						if(X_MaxCutMin > Y_MaxCutMin && X_MaxCutMin > Z_MaxCutMin)
-						{
-							mRatioX = 1;
-							mRatioY = (float)X_MaxCutMin/Y_MaxCutMin;
-							mRatioZ = (float)X_MaxCutMin/Z_MaxCutMin;				
-						}
-						else if(Y_MaxCutMin > X_MaxCutMin && Y_MaxCutMin > Z_MaxCutMin)
-						{
-							mRatioX = (float)Y_MaxCutMin/Z_MaxCutMin;
-							mRatioY = 1;
-							mRatioZ = (float)Y_MaxCutMin/Z_MaxCutMin;
-						}
-						else
-						{
-							mRatioX = (float)Z_MaxCutMin/X_MaxCutMin;
-							mRatioY = (float)Z_MaxCutMin/Y_MaxCutMin;
-							mRatioZ = 1;							
-						}
-						
-							mBiasX = mRatioX*(X_MaxCutMin*0.5f - DataSize[1]);
-							mBiasY = mRatioY*(Y_MaxCutMin*0.5f - DataSize[3]);
-							mBiasZ = mRatioZ*(Z_MaxCutMin*0.5f - DataSize[5]);
-						
-						SetCalibrateRatioBias(mRatioX,mRatioY,mRatioZ,mBiasX,mBiasY,mBiasZ);
-						mIsCalibrate = true;
-						LOG("cailibret end ---- \n");
-						
-//						while(1)
-//						{
-//							LOG(mRatioX);
-//							LOG("\t");
-//							LOG(mRatioY);
-//							LOG("\t");
-//							LOG(mRatioZ);
-//							LOG("\t");
-//							LOG(mBiasX);
-//							LOG("\t");
-//							LOG(mBiasY);
-//							LOG("\t");		
-//							LOG(mBiasZ);				
-//							LOG("\n");
-//						 tskmgr.DelayS(1);
-//						}
-						
-					
-						return true;
-				}	
-				
-				//保存上一次的值
-				OldData[0]=NowData[0];
-				OldData[1]=NowData[1];
-				OldData[2]=NowData[2];
-			
-				}else
-				{
-					LOG("Updata error--\n");
-				  continue;
-				}
-				
-			}			
-		}
+	mIsCalibrated = false;
+	return true;
 }
 
 bool HMC5883L::IsCalibrated()
 {
-	return mIsCalibrate;
+	return mIsCalibrated;
+}
+//获取磁力计校准的偏置
+Vector3f HMC5883L::GetOffsetBias()
+{
+	return mOffsetBias;
 }
 
+//获取磁力计校准的比例
+Vector3f HMC5883L::GetOffsetRatio()
+{
+	return mOffsetRatio;
+}
+
+//获取磁力计校准的偏置
+void HMC5883L::SetOffsetBias(float x,float y,float z)
+{
+	Vector3f bias(x,y,z);
+	mOffsetBias = bias;
+}
+
+//获取磁力计校准的比例
+void HMC5883L::SetOffsetRatio(float x,float y,float z)
+{
+	Vector3f ratio(x,y,z);
+	mOffsetRatio = ratio;
+}

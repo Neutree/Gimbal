@@ -133,14 +133,10 @@ class HMC5883L:public Sensor,public Magnetometer
 		I2C *mI2C;
 		unsigned char mHealth;
 		HMC5883DataTypeDef mData;
-	
-		bool mIsCalibrate;
-		float mRatioX;
-		float mRatioY;
-		float mRatioZ;
-		float mBiasX;
-		float mBiasY;
-		float mBiasZ;
+
+		bool mIsCalibrated;
+		
+		Vector3f mOffsetRatio,mOffsetBias;
 	
 	#ifdef HMC5883L_USE_TASKMANAGER
 		u16 mMaxUpdateFrequency;
@@ -228,17 +224,29 @@ class HMC5883L:public Sensor,public Magnetometer
 		////////////////////////////////
 		 virtual double GetUpdateInterval();
 		 
-		 //两轴校准设置校准的值 X的比例系数 Y的比例系数 X需加的常数 Y需加的常数
-		 bool SetCalibrateRatioBias(float RatioX,float RatioY,float BiasX,float BiasY);
-		 
-		 //三轴校准
-		 bool SetCalibrateRatioBias(float RatioX,float RatioY,float RatioZ,float BiasX,float BiasY,float BiasZ);
 		 
 		 //三轴校准函数，调用之后，拿着你的小飞机绕八字，传入的参数是当你每个轴都到达峰值而不在更新，这个时间之后就退出校准
-		 virtual bool Calibrate(double SpendTime);
+		 virtual bool StartCalibrate();
 		 
 		 //返回磁力计是否经过校准
-		 bool IsCalibrated();
+		 virtual bool IsCalibrated();
+		 
+		 
+		//获取磁力计校准的偏置
+		virtual Vector3f GetOffsetBias();
+		
+		//获取磁力计校准的比例
+		virtual Vector3f GetOffsetRatio();
+		
+			//获取磁力计校准的偏置
+		virtual void SetOffsetBias(float x,float y,float z);
+		
+		//获取磁力计校准的比例
+		virtual void SetOffsetRatio(float x,float y,float z);
+		
+		int xMaxMinusMin;
+		int yMaxMinusMin;
+		int zMaxMinusMin;
 		
 };
 #endif

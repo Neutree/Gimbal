@@ -501,11 +501,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\lib\offchip\BLDCMotor\BLDCMotor.cpp</FilePath>
             </File>
-            <File>
-              <FileName>Gimbal.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\lib\offchip\Gimbal\Gimbal.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -530,6 +525,11 @@
               <FileName>Communicate.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\app\Communicate.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Gimbal.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\lib\offchip\Gimbal\Gimbal.cpp</FilePath>
             </File>
           </Files>
         </Group>

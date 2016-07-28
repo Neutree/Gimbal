@@ -161,13 +161,15 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 	{
 //		if(*(data_buf+4)==0X01)
 //			mpu6050.Acc_CALIBRATE = 1;
-//		if(*(data_buf+4)==0X02)
-//			mpu6050.Gyro_CALIBRATE = 1;
+		if(*(data_buf+4)==0X02)
+			mGimbal.StartGyroCalibrate();
 //		if(*(data_buf+4)==0X03)
 //		{
 //			mpu6050.Acc_CALIBRATE = 1;		
 //			mpu6050.Gyro_CALIBRATE = 1;			
 //		}
+		if(*(data_buf+4)==0X04)
+			mGimbal.StartMagCalibrate();
 	}
 	
 	if(*(data_buf+2)==0X02)
@@ -207,7 +209,7 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
         data.mPIDYaw.SetKi( 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) ));
         data.mPIDYaw.SetKd( 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) ));
         ANO_DT_Send_Check(*(data_buf+2),sum);
-		data.SavePIDParam2Flash();
+		data.SaveParam2Flash();
     }
     if(*(data_buf+2)==0X11)								//PID2
     {
@@ -268,6 +270,96 @@ void Communicate::ANO_DT_Send_Power(u16 votage, u16 current)
 	data_to_send[_cnt++]=BYTE1(temp);
 	data_to_send[_cnt++]=BYTE0(temp);
 	
+	data_to_send[3] = _cnt-4;
+	
+	u8 sum = 0;
+	for(u8 i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	
+	data_to_send[_cnt++]=sum;
+	
+	mCom.SendData(data_to_send, _cnt);
+}
+
+void Communicate::ANO_DT_Send_Senser(s16 a_x,s16 a_y,s16 a_z,s16 g_x,s16 g_y,s16 g_z,s16 m_x,s16 m_y,s16 m_z,s32 bar)
+{
+	u8 _cnt=0;
+	vs16 _temp;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x02;
+	data_to_send[_cnt++]=0;
+	
+	_temp = a_x;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = a_y;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = a_z;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp = g_x;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = g_y;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = g_z;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp = m_x;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = m_y;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = m_z;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	data_to_send[3] = _cnt-4;
+	
+	u8 sum = 0;
+	for(u8 i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	mCom.SendData(data_to_send, _cnt);
+}
+
+
+void Communicate::ANO_DT_Send_RCData(u16 thr,u16 yaw,u16 rol,u16 pit,u16 aux1,u16 aux2,u16 aux3,u16 aux4,u16 aux5,u16 aux6)
+{
+	u8 _cnt=0;
+	
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x03;
+	data_to_send[_cnt++]=0;
+	data_to_send[_cnt++]=BYTE1(thr);
+	data_to_send[_cnt++]=BYTE0(thr);
+	data_to_send[_cnt++]=BYTE1(yaw);
+	data_to_send[_cnt++]=BYTE0(yaw);
+	data_to_send[_cnt++]=BYTE1(rol);
+	data_to_send[_cnt++]=BYTE0(rol);
+	data_to_send[_cnt++]=BYTE1(pit);
+	data_to_send[_cnt++]=BYTE0(pit);
+	data_to_send[_cnt++]=BYTE1(aux1);
+	data_to_send[_cnt++]=BYTE0(aux1);
+	data_to_send[_cnt++]=BYTE1(aux2);
+	data_to_send[_cnt++]=BYTE0(aux2);
+	data_to_send[_cnt++]=BYTE1(aux3);
+	data_to_send[_cnt++]=BYTE0(aux3);
+	data_to_send[_cnt++]=BYTE1(aux4);
+	data_to_send[_cnt++]=BYTE0(aux4);
+	data_to_send[_cnt++]=BYTE1(aux5);
+	data_to_send[_cnt++]=BYTE0(aux5);
+	data_to_send[_cnt++]=BYTE1(aux6);
+	data_to_send[_cnt++]=BYTE0(aux6);
+
 	data_to_send[3] = _cnt-4;
 	
 	u8 sum = 0;

@@ -33,6 +33,7 @@
 #include "I2C.h"
 #include "Vector3.h"
 #include "InertialSensor.h"
+#include "Configuration.h"
 #ifdef MPU6050_USE_TASKMANAGER
 	#include "TaskManager.h"
 #else
@@ -164,6 +165,12 @@ public:
 	///////////////////////////////
 	virtual	Vector3f GetAcc();//获取加速度原始值
 
+
+	///////////////////////////
+	///角速度校准值
+	//////////////////////////
+	virtual void SetGyrOffset(int ,int ,int);
+	
 	///////////////////////////
 	///角速度校准值
 	//////////////////////////

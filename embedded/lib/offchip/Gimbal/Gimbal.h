@@ -26,7 +26,8 @@ private:
 	AHRS_Algorithm mAHRS_Algorithm;
 	
 
-	bool mIsCalibrating;
+	bool mIsGyroCalibrating;
+	bool mIsMagCalibrating;
 
 public:
 	Vector3f mAngle;
@@ -35,13 +36,25 @@ public:
 	bool UpdateIMU();
 	bool UpdateMotor(int* motorRoll = 0,int* motorPitch = 0, int* motorYaw = 0);
 	float UpdateVoltage(uint8_t channelNumber,float resister_a,float resister_b,float fullRange);
-	bool IsCalibrated();
-	bool IsCalibrating();
+	bool IsGyroCalibrated();
+	bool IsGyroCalibrating();
+	void StartGyroCalibrate();
+	bool IsMagCalibrated();
+	bool IsMagCalibrating();
+	void StartMagCalibrate();
 
-	bool SavePIDParam2Flash();
+	bool ReadGyroOffset2Flash();
+	bool ReadMagOffset2Flash();
 	bool ReadPIDParam2Flash();
+	bool ReadParam2Flash();
+
+	bool SaveParam2Flash();
+	
 
 	PIDController mPIDRoll,mPIDPitch,mPIDYaw;
+
+	bool mIsArmed;
+	Vector3f mTargetAngle;
 };
 
 #endif
