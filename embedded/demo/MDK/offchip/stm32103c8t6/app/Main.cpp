@@ -20,10 +20,10 @@
 #include "Gimbal.h"
 /************************************硬件定义*************************************/
 //Timer T1(TIM1,1,2,3); //使用定时器计，溢出时间:1S+2毫秒+3微秒
-USART com(1,115200);
+USART com(1,115200,false);
 I2C i2c2(2); 
-mpu6050 mpu6050(i2c2,600);
-HMC5883L mag(i2c2);
+mpu6050 mpu6050(i2c2,100);
+HMC5883L mag(i2c2,500);
 PWM pwm2(TIM2,1,1,1,1,20000);  //开启时钟2的4个通道，频率2Whz
 PWM pwm3(TIM3,1,1,0,0,20000);  //开启时钟3的2个通道，频率2Whz
 PWM pwm4(TIM4,1,1,1,0,20000);  //开启时钟4的3个通道，频率2Whz
@@ -65,6 +65,7 @@ void init()
 	ledBlue.On();
 	ledRed.Off();
 	gimbal.Init();
+	gimbal.mIsArmed = true;
 }
 
 int motorValueRoll,motorValuePitch,motorValueYaw;
@@ -81,20 +82,21 @@ void loop()
 	ledBlue.Blink(0,0.5,false);
 	
 	//更新姿态、控制电机，500Hz
-	if(tskmgr.TimeSlice(record_tmgTest,0.01)) //每0.01秒执行一次
+	if(tskmgr.TimeSlice(record_tmgTest,0.001)) //每0.002秒执行一次
 	{
 		gimbal.UpdateIMU();//更新姿态
 		gimbal.UpdateMotor(&motorValueRoll,&motorValuePitch,&motorValueYaw);//控制电机
 	}
 	
-	//输出电源值和飞机姿态数据、电机数据。10Hz
+	//输出电源值和飞机姿态数据、电机数据。12.5Hz
 	if(tskmgr.TimeSlice(record_tmgTest2,0.08)) 
 	{
 //		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
 //		{
 			ledRed.Toggle();
 			communicate.ANO_DT_Send_Status(gimbal.mAngle.y*RtA,gimbal.mAngle.x*RtA,gimbal.mAngle.z*RtA,0,1,gimbal.mIsArmed);
-			communicate.ANO_DT_Send_MotoPWM(motorValueRoll%256+256,motorValuePitch%256+256,motorValueYaw%256+256,0,0,0,0,0);
+			//communicate.ANO_DT_Send_MotoPWM(motorValueRoll%256+256,motorValuePitch%256+256,motorValueYaw%256+256,0,0,0,0,0);
+			communicate.ANO_DT_Send_MotoPWM(motorValueRoll,motorValuePitch,motorValueYaw,0,0,0,0,0);
 			communicate.ANO_DT_Send_Power(gimbal.UpdateVoltage(4,5.1,1,12)*100,0);
 			if(!gimbal.IsMagCalibrated())
 				communicate.ANO_DT_Send_Senser(mpu6050.GetAcc().x*1000,mpu6050.GetAcc().y*1000,mpu6050.GetAcc().z*1000,mpu6050.GetGyrRaw().x,mpu6050.GetGyrRaw().y,mpu6050.GetGyrRaw().z,mag.xMaxMinusMin,mag.yMaxMinusMin,mag.zMaxMinusMin,0);

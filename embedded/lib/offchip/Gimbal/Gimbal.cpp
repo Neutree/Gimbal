@@ -5,6 +5,7 @@ Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMo
 :mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mFlash(flash_),mIsGyroCalibrating(false)
 {
 	mIsArmed = false;
+	mTargetAngle(0,0,0);
 }
 bool Gimbal::Init()
 {
@@ -82,12 +83,18 @@ bool Gimbal::UpdateIMU()
 }
 bool Gimbal::UpdateMotor(int* motorRoll,int* motorPitch, int* motorYaw)
 {
-	int v = mPIDRoll.Controll(0,mAngle.y);
-	int v2 = mPIDPitch.Controll(0,mAngle.x);
-	int v3 = mPIDYaw.Controll(0,mAngle.z);
+//	static int count = 0;
+//	if(++count>100)
+//	{
+//		count =0;
+//		LOG("roll:");
+//	}
+	int v = mPIDRoll.Controll(mTargetAngle.y,mAngle.y);
+	int v2 = mPIDPitch.Controll(mTargetAngle.x,mAngle.x);
+	int v3 = mPIDYaw.Controll(mTargetAngle.z,mAngle.z);
 
 	v2=-v2;
-	v3 = -v3;
+	v3=-v3;
 	mMotorRoll.SetPosition(v);
 	mMotorPitch.SetPosition(v2);
 	mMotorYaw.SetPosition(v3);
@@ -159,12 +166,12 @@ bool Gimbal::SaveParam2Flash()
 	u16 data[20];
 	data[0] = 0x00aa;
 	data[1] = 0x00bb;
-	data[2] = mPIDRoll.mKp*1000;
-	data[3] = mPIDRoll.mKi*1000;
-	data[4] = mPIDRoll.mKd*1000;
-	data[5] = mPIDPitch.mKp*1000;
-	data[6] = mPIDPitch.mKi*1000;
-	data[7] = mPIDPitch.mKd*1000;
+	data[2] = mPIDRoll.mKp;
+	data[3] = mPIDRoll.mKi;
+	data[4] = mPIDRoll.mKd;
+	data[5] = mPIDPitch.mKp;
+	data[6] = mPIDPitch.mKi;
+	data[7] = mPIDPitch.mKd;
 	data[8] = mPIDYaw.mKp*1000;
 	data[9] = mPIDYaw.mKi*1000;
 	data[10] = mPIDYaw.mKd*1000;
@@ -180,7 +187,7 @@ bool Gimbal::SaveParam2Flash()
 	mFlash.Clear(0);
 	if(!mFlash.Write(0,0,data,20))
 		return false;
-	ReadParam2Flash();
+	ReadParam2Flash();	
 	return true;
 }
 
@@ -191,15 +198,15 @@ bool Gimbal::ReadPIDParam2Flash()
 		return false;
 	if(data[0]!=0x00aa || data[1]!=0x00bb)
 		return false;
-	mPIDRoll.SetKp(data[2]/1000.0);
-	mPIDRoll.SetKi(data[3]/1000.0);
-	mPIDRoll.SetKd(data[4]/1000.0);
-	mPIDPitch.SetKp(data[5]/1000.0);
-	mPIDPitch.SetKi(data[6]/1000.0);
-	mPIDPitch.SetKd(data[7]/1000.0);
-	mPIDYaw.SetKp(data[8]/1000.0);
-	mPIDYaw.SetKi(data[9]/1000.0);
-	mPIDYaw.SetKd(data[10]/1000.0);
+	mPIDRoll.SetKp(data[2]);
+	mPIDRoll.SetKi(data[3]);
+	mPIDRoll.SetKd(data[4]);
+	mPIDPitch.SetKp(data[5]);
+	mPIDPitch.SetKi(data[6]);
+	mPIDPitch.SetKd(data[7]);
+	mPIDYaw.SetKp(data[8]);
+	mPIDYaw.SetKi(data[9]);
+	mPIDYaw.SetKd(data[10]);
 	return true;
 }
 bool Gimbal::ReadGyroOffset2Flash()
@@ -247,12 +254,12 @@ bool Gimbal::ReadParam2Flash()
 		return false;
 	if(data[0]!=0x00aa || data[1]!=0x00bb)
 		return false;
-	mPIDRoll.SetKp(data[2]/1000.0);
-	mPIDRoll.SetKi(data[3]/1000.0);
-	mPIDRoll.SetKd(data[4]/1000.0);
-	mPIDPitch.SetKp(data[5]/1000.0);
-	mPIDPitch.SetKi(data[6]/1000.0);
-	mPIDPitch.SetKd(data[7]/1000.0);
+	mPIDRoll.SetKp(data[2]);
+	mPIDRoll.SetKi(data[3]);
+	mPIDRoll.SetKd(data[4]);
+	mPIDPitch.SetKp(data[5]);
+	mPIDPitch.SetKi(data[6]);
+	mPIDPitch.SetKd(data[7]);
 	mPIDYaw.SetKp(data[8]/1000.0);
 	mPIDYaw.SetKi(data[9]/1000.0);
 	mPIDYaw.SetKd(data[10]/1000.0);

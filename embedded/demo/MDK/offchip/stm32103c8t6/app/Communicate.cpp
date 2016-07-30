@@ -176,12 +176,9 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 	{
 		if(*(data_buf+4)==0X01)
 		{
-//			f.send_pid1 = 1;
-//			f.send_pid2 = 1;
-//			f.send_pid3 = 1;
-//			f.send_pid4 = 1;
-//			f.send_pid5 = 1;
-//			f.send_pid6 = 1;
+			ANO_DT_Send_PID(1,mGimbal.mPIDRoll.mKp,mGimbal.mPIDRoll.mKi,mGimbal.mPIDRoll.mKd,
+							  mGimbal.mPIDPitch.mKp,mGimbal.mPIDPitch.mKd,mGimbal.mPIDPitch.mKd,
+							  mGimbal.mPIDYaw.mKp*1000,mGimbal.mPIDYaw.mKi*1000,mGimbal.mPIDYaw.mKd*1000);
 		}
 		if(*(data_buf+4)==0X02)
 		{
@@ -196,18 +193,25 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 //			Para_ResetToFactorySetup();
 		}
 	}
+	
+	if(*(data_buf+2)==0X03)//目标角度控制
+	{		
+		mGimbal.mTargetAngle.x = ((( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ) -1000)/2.77778 - 180)*RtA;
+		mGimbal.mTargetAngle.y = ((( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) )-1000)/2.77778 - 180)*RtA;
+		mGimbal.mTargetAngle.z = ((( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) )-1000)/2.77778 - 180)*RtA;
+	}
 
 	if(*(data_buf+2)==0X10)								//PID1
     {
-        data.mPIDRoll.SetKp( 0.001*( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) ));
-        data.mPIDRoll.SetKi(  0.001*( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) ));
-        data.mPIDRoll.SetKd(  0.001*( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) ));
-        data.mPIDPitch.SetKp( 0.001*( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ));
-        data.mPIDPitch.SetKi( 0.001*( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) ));
-        data.mPIDPitch.SetKd( 0.001*( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) ));
-        data.mPIDYaw.SetKp( 0.001*( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) ));
-        data.mPIDYaw.SetKi( 0.001*( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) ));
-        data.mPIDYaw.SetKd( 0.001*( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) ));
+        data.mPIDRoll.SetKp( ( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) ));
+        data.mPIDRoll.SetKi( ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) ));
+        data.mPIDRoll.SetKd(  ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) ));
+        data.mPIDPitch.SetKp( ( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ));
+        data.mPIDPitch.SetKi( ( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) ));
+        data.mPIDPitch.SetKd( ( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) ));
+        data.mPIDYaw.SetKp(( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) )/1000.0);
+        data.mPIDYaw.SetKi( ( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) )/1000.0);
+        data.mPIDYaw.SetKd( ( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) )/1000.0);
         ANO_DT_Send_Check(*(data_buf+2),sum);
 		data.SaveParam2Flash();
     }
@@ -370,6 +374,59 @@ void Communicate::ANO_DT_Send_RCData(u16 thr,u16 yaw,u16 rol,u16 pit,u16 aux1,u1
 	
 	mCom.SendData(data_to_send, _cnt);
 }
+
+
+void Communicate::ANO_DT_Send_PID(u8 group,float p1_p,float p1_i,float p1_d,float p2_p,float p2_i,float p2_d,float p3_p,float p3_i,float p3_d)
+{
+	u8 _cnt=0;
+	vs16 _temp;
+	
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x10+group-1;
+	data_to_send[_cnt++]=0;
+	
+	
+	_temp = p1_p ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p1_i  ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p1_d  ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p2_p  ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p2_i  ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p2_d ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p3_p  ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p3_i  ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = p3_d ;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	data_to_send[3] = _cnt-4;
+	
+	u8 sum = 0;
+	for(u8 i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	
+	data_to_send[_cnt++]=sum;
+
+	mCom.SendData(data_to_send, _cnt);
+}
+
+
 
 
 

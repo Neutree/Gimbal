@@ -22,7 +22,6 @@ public:
 	
 	Vector3f GetAngleMahony(Vector3<int> acc, Vector3<float> gyro,Vector3<int> mag,float deltaT)
 	{
-		
 		return mMahonyAHRS.GetAngle(acc,gyro,mag,deltaT);
 	}
 	

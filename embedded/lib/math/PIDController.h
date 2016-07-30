@@ -1,5 +1,6 @@
 #ifndef __PIDCONTROLLER_H
 #define __PIDCONTROLLER_H
+#include "Configuration.h"
 
 class PIDController
 {
@@ -27,14 +28,20 @@ public:
 	{
 		float err = target - now;
 		
-		float detaI = err*mKi*2;
+		float detaI = err*mKi;
 		
 		if(detaI>10)  detaI = 10; 
 		if(detaI<-10) detaI = -10;
 			
 		_Ierr += detaI;
-		_Derr =  (err -_Perr)*500;
+		_Derr =  (err -_Perr);
 		_Perr = err;
+//		static int count=0;
+//		if(++count>100)
+//		{
+//			count = 0;
+//			DEBUG_LOG<<"tar:"<<target<<"\tnow:"<<now<<"\terror:"<<err<<"\tdetaI:"<<detaI<<"\t_Ierr:"<<_Ierr<<"\t_Ddrr:"<<_Derr<<"\tout:"<<1000*err <<"\n";
+//		}
 		return mKp*_Perr + _Ierr + mKd*_Derr;
 	}
 	void AddKp(float value)
