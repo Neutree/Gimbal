@@ -1,13 +1,369 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.neucrack.gimbal.FragmentStatus">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="status fragment" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
-</FrameLayout>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:text="角度"
+                android:id="@+id/textView_angle_label"
+                android:layout_column="0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="roll        "
+                android:id="@+id/textView_angle_roll_label"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="pitch        "
+                android:id="@+id/textView_angle_pitch_label"
+                android:layout_column="2"
+                android:layout_marginLeft="15dp"
+                />
+            <TextView
+                android:text="yaw        "
+                android:id="@+id/textView_angle_yaw_label"
+                android:layout_column="3"
+                android:layout_marginLeft="15dp"
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:text="0°"
+                android:id="@+id/textView_angle_roll"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0°"
+                android:id="@+id/textView_angle_pitch"
+                android:layout_column="2"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0°"
+                android:id="@+id/textView_angle_yaw"
+                android:layout_column="3"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:text="加速度"
+                android:id="@+id/textView_acc_label"
+                android:layout_column="0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="acc_x        "
+                android:id="@+id/textView_acc_x_label"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="acc_y        "
+                android:id="@+id/textView_acc_y_label"
+                android:layout_column="2"
+                android:layout_marginLeft="15dp"
+                />
+            <TextView
+                android:text="acc_z        "
+                android:id="@+id/textView_acc_z_label"
+                android:layout_column="3"
+                android:layout_marginLeft="15dp"
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:text="0"
+                android:id="@+id/textView_acc_x"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_acc_y"
+                android:layout_column="2"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_acc_z"
+                android:layout_column="3"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:text="角速度"
+                android:id="@+id/textView_gyro_label"
+                android:layout_column="0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="gyro_x        "
+                android:id="@+id/textView_gyro_x_label"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="gyro_y        "
+                android:id="@+id/textView_gyro_y_label"
+                android:layout_column="2"
+                android:layout_marginLeft="15dp"
+                />
+            <TextView
+                android:text="gyro_z        "
+                android:id="@+id/textView_gyro_z_label"
+                android:layout_column="3"
+                android:layout_marginLeft="15dp"
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:text="0"
+                android:id="@+id/textView_gyro_x"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_gyro_y"
+                android:layout_column="2"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_gyro_z"
+                android:layout_column="3"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:text="磁场"
+                android:id="@+id/textView_mag_label"
+                android:layout_column="0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="mag_x        "
+                android:id="@+id/textView_mag_x_label"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="mag_y        "
+                android:id="@+id/textView_mag_y_label"
+                android:layout_column="2"
+                android:layout_marginLeft="15dp"
+                />
+            <TextView
+                android:text="mag_z        "
+                android:id="@+id/textView_mag_z_label"
+                android:layout_column="3"
+                android:layout_marginLeft="15dp"
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:text="0"
+                android:id="@+id/textView_mag_x"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_mag_y"
+                android:layout_column="2"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_mag_z"
+                android:layout_column="3"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"/>
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:text="电机"
+                android:id="@+id/textView_motor_label"
+                android:layout_column="0"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="roll        "
+                android:id="@+id/textView_motor_roll_label"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="pitch        "
+                android:id="@+id/textView_motor_pitch_label"
+                android:layout_column="2"
+                android:layout_marginLeft="15dp"
+                />
+            <TextView
+                android:text="yaw        "
+                android:id="@+id/textView_motor_yaw_label"
+                android:layout_column="3"
+                android:layout_marginLeft="15dp"
+                />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="0"
+                android:id="@+id/textView_motor_roll"
+                android:layout_column="1"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_motor_pitch"
+                android:layout_column="2"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/textView_motor_yaw"
+                android:layout_column="3"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="15dp"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="25dp">
+
+            <TextView
+                android:text="电压"
+                android:id="@+id/textView_voltage_label"
+                android:layout_column="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0V"
+                android:layout_marginLeft="15dp"
+                android:id="@+id/textView_voltage"
+                android:layout_column="1" />
+        </TableRow>
+    </TableLayout>
+</RelativeLayout>

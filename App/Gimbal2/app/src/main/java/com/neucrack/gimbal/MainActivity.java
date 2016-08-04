@@ -188,7 +188,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if(contentLength>=6)
                     mStatusPage.showAngle( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0, ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff))/100.0, ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff))/100.0 );
                 if(contentLength>=12)
-                    mStatusPage.showArm(((messageFrame[11]&0xff)>0?true:false));
+                    mControlPage.showArm(((messageFrame[11]&0xff)>0?true:false));
                 break;
             case 2://传感器数据
                 if(contentLength>=18)

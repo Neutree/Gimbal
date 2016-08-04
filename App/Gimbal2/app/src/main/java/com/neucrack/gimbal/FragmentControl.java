@@ -44,5 +44,6 @@ public class FragmentControl extends Fragment {
     }
 
 
-
+    public void showArm(boolean armed) {
+    }
 }
