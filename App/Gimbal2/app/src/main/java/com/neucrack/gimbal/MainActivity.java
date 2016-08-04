@@ -191,12 +191,22 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     mStatusPage.showArm(((messageFrame[11]&0xff)>0?true:false));
                 break;
             case 2://传感器数据
+                if(contentLength>=18)
+                    mStatusPage.showRawData( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0, ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff))/100.0, ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff))/100.0,
+                            ((messageFrame[10]&0xff)<<8|(messageFrame[11]&0xff)), ((messageFrame[12]&0xff)<<8|(messageFrame[13]&0xff)), ((messageFrame[14]&0xff)<<8|(messageFrame[15]&0xff)),
+                            ((messageFrame[16]&0xff)<<8|(messageFrame[17]&0xff)), ((messageFrame[18]&0xff)<<8|(messageFrame[19]&0xff)), ((messageFrame[20]&0xff)<<8|(messageFrame[21]&0xff)) );
                 break;
             case 3://遥控数据
+                if(contentLength>=8)
+                    mStatusPage.showRCData(  (((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff))-1000)/2.77778 - 180, (((messageFrame[10]&0xff)<<8|(messageFrame[11]&0xff))-1000)/2.77778 - 180,(((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff))-1000)/2.77778 - 180);
                 break;
             case 5://电压数据
+                if(contentLength>=2)
+                    mStatusPage.showVoltage(((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0);
                 break;
             case 6://电机数据
+                if(contentLength>=6)
+                    mStatusPage.showMotor( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff)), ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff)), ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff)) );
                 break;
         }
     }

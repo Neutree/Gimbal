@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,11 +36,24 @@ public class FragmentStatus extends Fragment {
     }
 
     public void showAngle(double roll,double pitch,double yaw){
-
+        Log.v("a","showAngle:"+roll+"\t"+pitch+"\t"+yaw);
     }
 
 
     public void showArm(boolean armed) {
 
+    }
+
+    public void showRawData(double acc_x, double acc_y, double acc_z, int gryo_x, int gryo_y, int gryo_z, int mag_x, int mag_y, int mag_z) {
+
+    }
+
+    public void showRCData(double rc_roll, double rc_pitch, double rc_yaw) {
+    }
+
+    public void showVoltage(double voltage) {
+    }
+
+    public void showMotor(int motor_roll, int motor_pitch, int motor_yaw) {
     }
 }
