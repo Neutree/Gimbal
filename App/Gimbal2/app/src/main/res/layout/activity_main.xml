@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:id="@+id/button_panel"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:weightSum="3">
+
+        <Button
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="状态"
+            android:id="@+id/button_status"
+            android:layout_gravity="bottom"
+            android:background="@drawable/ripple_bg"
+            android:textColor="#ffffff" />
+        <Button
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="控制"
+            android:id="@+id/button_control"
+            android:layout_gravity="bottom"
+            android:background="@drawable/ripple_bg"
+            android:textColor="#ffffff" />
+        <Button
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" 设置"
+            android:id="@+id/button_settings"
+            android:layout_gravity="bottom"
+            android:background="@drawable/ripple_bg"
+            android:textColor="#ffffff" />
+
+
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button_panel"
+        android:id="@+id/fragment_content">
+    </RelativeLayout>
+
+</RelativeLayout>
