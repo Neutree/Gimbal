@@ -32,10 +32,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private int mReceivedBufferIndex = -1;
 
     private int mStatusConnectedToServer = -1;//-1：未连接 0：连接成功 1：正在连接 2;连接断开
+    private Thread mConnectionThread;
+    private boolean mIsShowRawReceivedData=false;
+    private boolean mIsProgramExit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v("a","onCreate");
         setContentView(R.layout.activity_main);
 
         mButtonStatus = (Button) findViewById(R.id.button_status);
@@ -49,29 +53,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         mStatusPage = new FragmentStatus();
-        transaction.add(R.id.fragment_content,mStatusPage);
+        transaction.replace(R.id.fragment_content, mStatusPage);
         transaction.commit();
 
         WifiSocketManager.getInstance().init(getApplicationContext());
-        //建立一个线程专门用来监控连接
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true){
-                    if(mStatusConnectedToServer == -1) {//未连接
-                        mStatusConnectedToServer = 1;//标志正在连接
-                        showHintConnecting(mStatusConnectedToServer);
-                        WifiSocketManager.getInstance().connect(8090);
-                    }
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-        }).start();
+        mIsProgramExit = false;
+        if(mConnectionThread == null) {
+            //建立一个线程专门用来监控连接
+            mConnectionThread = new Thread(new ConnectionDetectThread());
+            mConnectionThread.start();
+        }
         WifiSocketManager.getInstance().setConnectionCallBack(new WifiSocketManager.ConnectionCallBack() {
             @Override
             public void onConnected() {
@@ -119,7 +110,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                             //判断长度，一帧数据是否全部到达完毕
                             int frameLength = (mReceivedBuffer[3] & 0xff) + 5;
                             if (frameLength <= mReceivedBufferIndex + 1) {//长度够
-                                dealMessageFrame(mReceivedBuffer);
+                                //校验帧
+                                int sum=0;
+                                for(int j=0;j<frameLength-1;++j)
+                                    sum+=(mReceivedBuffer[j]&0xff);
+                                sum%=256;
+                                if(sum == mReceivedBuffer[frameLength-1])
+                                    dealMessageFrame(mReceivedBuffer);
                                 //将已经处理过的帧从缓冲区删除
                                 for (int j = 0; j < mReceivedBufferIndex + 1 - frameLength; ++j)
                                     mReceivedBuffer[j] = mReceivedBuffer[frameLength + j];
@@ -133,12 +130,36 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }
             @Override
             public void onNewMessageCome(byte[] receiveData) {
+                if(mIsShowRawReceivedData)
+                    showRawReceivedData(receiveData);
                 //将数据放入缓冲区
                 for(int i=0;i<receiveData.length;++i)
                     mReceivedBuffer[++mReceivedBufferIndex] = receiveData[i];
                 deal();
             }
         });
+    }
+
+    class ConnectionDetectThread implements Runnable{
+
+        @Override
+        public void run() {
+            while (!mIsProgramExit) {
+                if (mStatusConnectedToServer == -1) {//未连接
+                    mStatusConnectedToServer = 1;//标志正在连接
+                    showHintConnecting(mStatusConnectedToServer);
+                    WifiSocketManager.getInstance().connect(8090);
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    private void showRawReceivedData(byte[] data) {
+        mSettingsPage.showRawReceivedData(data);
     }
 
     private void showHintConnecting(final int connectionStatus) {
@@ -161,6 +182,22 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         int contentLength = (messageFrame[3]&0xff);
         for(int i=0;i<contentLength +5;++i){
             Log.v("a",(messageFrame[i]&0xff)+"");
+        }
+        switch ((messageFrame[2]&0xff)){
+            case 1://姿态数据
+                if(contentLength>=6)
+                    mStatusPage.showAngle( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0, ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff))/100.0, ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff))/100.0 );
+                if(contentLength>=12)
+                    mStatusPage.showArm(((messageFrame[11]&0xff)>0?true:false));
+                break;
+            case 2://传感器数据
+                break;
+            case 3://遥控数据
+                break;
+            case 5://电压数据
+                break;
+            case 6://电机数据
+                break;
         }
     }
 
@@ -188,5 +225,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 break;
         }
         transaction.commit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v("a","onDestroy");
+        mIsProgramExit = true;
+        mConnectionThread = null;
     }
 }

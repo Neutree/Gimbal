@@ -44,4 +44,7 @@ public class FragmentSettings extends Fragment {
     }
 
 
+    public void showRawReceivedData(byte[] data) {
+
+    }
 }

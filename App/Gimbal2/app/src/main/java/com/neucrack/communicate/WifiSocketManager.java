@@ -113,7 +113,6 @@ public class WifiSocketManager {
 	 */
 	public void connect(final int port){
 		final byte[] bytedata=new byte[1024];
-	    final int[] DataToint=new int[1024];
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
