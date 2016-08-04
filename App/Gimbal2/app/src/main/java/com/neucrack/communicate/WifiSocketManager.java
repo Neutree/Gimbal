@@ -155,6 +155,7 @@ public class WifiSocketManager {
 	                            Log.i("TAG", "");
 	                            return;
 	                        }
+							return;
 	                    }
 	            	}
 	        	}
@@ -165,19 +166,13 @@ public class WifiSocketManager {
 	                try {
 						if((count = mReadBuffer.read(bytedata))!=-1)
 						{
-//							if(CheckSum(bytedata,count))   //和校验暂时取消，以后加上
-//							{
-//								Log.i("TAG", "接收"+String.valueOf(count));
-//								for (int i = 0; i < bytedata.length; i++){
-									int Data[] = new int[count];
+							byte Data[] = new byte[count];
 							for (int i = 0; i < count; i++){
-						            int results = bytedata[i] & 0xFF;
-									Data[i]=results;
+									Data[i] = bytedata[i];
 						        }
 								if (messageCallBack != null){
 									messageCallBack.onNewMessageCome(Data);
 								}
-//							}
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -260,7 +255,7 @@ public class WifiSocketManager {
 		
 		void onSendSeccess();
 		void onSendFail();
-		void onNewMessageCome(int[] receiveData);
+		void onNewMessageCome(byte[] receiveData);
 	}
 
 	

@@ -34,5 +34,9 @@ public class FragmentStatus extends Fragment {
         return inflater.inflate(R.layout.fragment_fragment_status, container, false);
     }
 
+    public void showAngle(int roll,int pitch,int yaw){
+
+    }
+
 
 }
