@@ -85,7 +85,19 @@
                 android:layout_gravity="center_horizontal"
                 />
         </LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5">
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="置零"
+                android:id="@+id/button_to_zero"
+                android:background="@drawable/ripple_bg_button"
+                android:layout_gravity="right|center_vertical" />
+        </FrameLayout>
 
     </LinearLayout>
 </LinearLayout>

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -38,6 +39,7 @@ public class FragmentControl extends Fragment {
     private SeekBar mSeekBarRoll,mSeekBarYaw;
     private SeekBarVertical mSeekBarPitch;
     private TextView mTextViewRoll,mTextViewYaw,mTextViewPitch;
+    private Button mToZero;
     private boolean mIsAllowSend = false;
 
 
@@ -107,14 +109,25 @@ public class FragmentControl extends Fragment {
         mTextViewRoll = (TextView) view.findViewById(R.id.textView_roll);
         mTextViewYaw = (TextView) view.findViewById(R.id.textView_yaw);
         mTextViewPitch = (TextView) view.findViewById(R.id.textView_pitch);
+        mToZero = (Button) view.findViewById(R.id.button_to_zero);
 
         mSeekBarRoll.setOnSeekBarChangeListener(new onSeekBarChangeListenerImp(mTextViewRoll,"roll"));
         mSeekBarYaw.setOnSeekBarChangeListener(new onSeekBarChangeListenerImp(mTextViewYaw,"yaw"));
         mSeekBarPitch.setOnSeekBarChangeListener(new onSeekBarChangeListenerImp(mTextViewPitch,"pitch"));
 
+
         mSeekBarRoll.setProgress(50);
         mSeekBarYaw.setProgress(50);
         mSeekBarPitch.setProgress(50);
+
+        mToZero.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSeekBarRoll.setProgress(50);
+                mSeekBarYaw.setProgress(50);
+                mSeekBarPitch.setProgress(50);
+            }
+        });
         return view;
     }
 
