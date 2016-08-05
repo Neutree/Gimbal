@@ -135,7 +135,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if(mIsShowRawReceivedData)
                     showRawReceivedData(receiveData);
                 //将数据放入缓冲区
-                for(int i=0;i<receiveData.length;++i)
+                for(int i=0;i<receiveData.length&&(mReceivedBufferIndex<2048);++i)
                     mReceivedBuffer[++mReceivedBufferIndex] = receiveData[i];
                 deal();
             }
@@ -228,16 +228,25 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if(mStatusPage==null)
                     mStatusPage = new FragmentStatus();
                 transaction.replace(R.id.fragment_content,mStatusPage);
+                mButtonStatus.setTextSize(18);
+                mButtonControl.setTextSize(14);
+                mButtonSettings.setTextSize(14);
                 break;
             case R.id.button_control:
                 if(mControlPage==null)
                     mControlPage = new FragmentControl();
                 transaction.replace(R.id.fragment_content,mControlPage);
+                mButtonStatus.setTextSize(14);
+                mButtonControl.setTextSize(18);
+                mButtonSettings.setTextSize(14);
                 break;
             case R.id.button_settings:
                 if(mSettingsPage==null)
                     mSettingsPage = new FragmentSettings();
                 transaction.replace(R.id.fragment_content,mSettingsPage);
+                mButtonStatus.setTextSize(14);
+                mButtonControl.setTextSize(14);
+                mButtonSettings.setTextSize(18);
                 break;
             default:
                 break;

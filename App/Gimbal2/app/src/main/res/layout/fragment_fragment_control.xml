@@ -1,13 +1,91 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.neucrack.gimbal.FragmentControl">
+    android:orientation="horizontal"
+    tools:context="com.neucrack.gimbal.FragmentControl"
+    android:weightSum="5">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-</FrameLayout>
+            <com.neucrack.component.SeekBarVertical
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/seekbar_pitch"
+                android:layout_marginLeft="10dp"/>
+            <TextView
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:text="pitch  0°"
+                android:layout_gravity="center_vertical"
+                android:id="@+id/textView_pitch" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="4"
+        android:weightSum="10">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2">
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="roll  0°"
+                android:id="@+id/textView_roll"
+                android:layout_gravity="center_horizontal"
+                />
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar_roll"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="yaw  0°"
+                android:id="@+id/textView_yaw"
+                android:layout_gravity="center_horizontal"
+                />
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/seekBar_yaw"
+                android:layout_gravity="center_horizontal"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

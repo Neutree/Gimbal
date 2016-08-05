@@ -188,7 +188,7 @@ public class WifiSocketManager {
      * 发送数据到模块
      * @param sendbuffer 需要发送的字节数组
      */
-    public void SendDataToSensor(byte[] sendbuffer)
+    public void SendData(byte[] sendbuffer)
     {
       	try {
       		if(CheckSum(sendbuffer,sendbuffer.length))
@@ -214,11 +214,10 @@ public class WifiSocketManager {
      */
     private boolean CheckSum(byte[] byteData, int count) {
 		
-        byte sum = 0;
-        int i = 0;
-        for(i=0;i<count-1;i++)
+        int sum = 0;
+        for(int i=0;i<count-1;i++)
         {
-        	sum +=byteData[i]&0xff;
+        	sum +=(byteData[i]&0xff);
         }
         if((sum&0xff) == (byteData[count-1]&0xff))
         {
