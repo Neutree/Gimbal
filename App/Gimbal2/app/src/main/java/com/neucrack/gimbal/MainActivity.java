@@ -216,6 +216,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     mStatusPage.showMotor(((messageFrame[4]) << 8 | (messageFrame[5] & 0xff)), ((messageFrame[6]) << 8 | (messageFrame[7] & 0xff)), ((messageFrame[8]) << 8 | (messageFrame[9] & 0xff)));
                 }
                 break;
+            case 0x10://PID参数
+                mSettingsPage.SetParameters(((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff)), ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff)), ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff)),
+                                            ((messageFrame[10]&0xff)<<8|(messageFrame[11]&0xff)), ((messageFrame[12]&0xff)<<8|(messageFrame[13]&0xff)), ((messageFrame[14]&0xff)<<8|(messageFrame[15]&0xff)),
+                                            ((messageFrame[16]&0xff)<<8|(messageFrame[17]&0xff)), ((messageFrame[18]&0xff)<<8|(messageFrame[19]&0xff)), ((messageFrame[20]&0xff)<<8|(messageFrame[21]&0xff)));
+                 break;
         }
     }
 

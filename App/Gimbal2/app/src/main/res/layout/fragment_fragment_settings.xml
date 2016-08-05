@@ -1,13 +1,225 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="2"
     tools:context="com.neucrack.gimbal.FragmentSettings">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+
+
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="settings" />
+        android:layout_weight="1"
+        android:padding="10dp">
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="5"
+            android:layout_margin="10dp">
 
-</FrameLayout>
+            <TextView
+                android:layout_weight="1"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="P"
+                android:layout_weight="1"
+                android:layout_column="1"
+                android:id="@+id/textView_PID_P_label" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="I"
+                android:layout_weight="1"
+                android:layout_column="2"
+                android:id="@+id/textView_PID_I_label"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="D"
+                android:layout_weight="1"
+                android:layout_column="3"
+                android:id="@+id/textView_PID_D_label"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="5"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="roll"
+                android:id="@+id/textView_PID_roll"
+                android:layout_column="0"
+                android:layout_weight="1"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_roll_P" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_roll_I" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_roll_D" />
+        </TableRow>
+
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="5"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="pitch"
+                android:id="@+id/textView_PID_pitch"
+                android:layout_column="0"
+                android:layout_weight="1"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_pitch_P" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_pitch_I" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_pitch_D" />
+
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="5"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="yaw"
+                android:id="@+id/textView_PID_yaw"
+                android:layout_column="0"
+                android:layout_weight="1"/>
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_yaw_P" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_yaw_I" />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:id="@+id/editText_PID_yaw_D" />
+        </TableRow>
+    </TableLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="保存本地"
+            android:id="@+id/button_save_local"
+            android:background="@drawable/ripple_bg_button"
+            android:textColor="#ffffff"
+            android:layout_alignTop="@+id/button_read_local"
+            android:layout_alignLeft="@+id/button_send_param"
+            android:layout_alignStart="@+id/button_send_param" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设置参数"
+            android:id="@+id/button_send_param"
+            android:background="@drawable/ripple_bg_button"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/button_save_local"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="读取参数"
+            android:id="@+id/button_read"
+            android:background="@drawable/ripple_bg_button"
+            android:textColor="#ffffff"
+            android:layout_alignTop="@+id/button_send_param"
+            android:layout_toRightOf="@+id/button_send_param"
+            android:layout_toEndOf="@+id/button_send_param" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="读取本地"
+            android:id="@+id/button_read_local"
+            android:background="@drawable/ripple_bg_button"
+            android:textColor="#ffffff"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/button_save_local"
+            android:layout_toEndOf="@+id/button_save_local"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="角速度校准"
+            android:id="@+id/button_gyro_calibrate"
+            android:background="@drawable/ripple_bg_button"
+            android:textColor="#ffffff"
+            android:layout_below="@+id/button_send_param"
+            android:layout_alignLeft="@+id/button_send_param"
+            android:layout_alignStart="@+id/button_send_param" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="磁力计校准"
+            android:id="@+id/button_mag_calibrate"
+            android:background="@drawable/ripple_bg_button"
+            android:textColor="#ffffff"
+            android:layout_alignTop="@+id/button_gyro_calibrate"
+            android:layout_toRightOf="@+id/button_send_param"
+            android:layout_toEndOf="@+id/button_send_param" />
+
+    </RelativeLayout>
+</LinearLayout>

@@ -79,7 +79,7 @@ public class FragmentControl extends Fragment {
             dataToSend[10] = (byte) ((pitch&0xff00)>>8);
             dataToSend[11] = (byte) (pitch&0xff);
             int sum = 0;
-            for(int i=0;i<19;i++)
+            for(int i=0;i<24;i++)
             {
                 sum +=dataToSend[i]&0xff;
             }

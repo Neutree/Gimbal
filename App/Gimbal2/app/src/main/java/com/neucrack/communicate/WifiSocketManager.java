@@ -178,7 +178,14 @@ public class WifiSocketManager {
 						if (connectionCallBack != null){
 							connectionCallBack.onDisConnected();
 						}
+						return;
+					}catch (Exception e){
+						if (connectionCallBack != null){
+							connectionCallBack.onDisConnected();
+						}
+						return;
 					}
+
 	            }
 	        }
 		});
@@ -193,6 +200,11 @@ public class WifiSocketManager {
       	try {
       		if(CheckSum(sendbuffer,sendbuffer.length))
       		{
+				if(mWriteBuffer==null){
+					messageCallBack.onSendFail();
+					return;
+				}
+
       			mWriteBuffer.write(sendbuffer);
       			if(messageCallBack!=null){
       				messageCallBack.onSendSeccess();
