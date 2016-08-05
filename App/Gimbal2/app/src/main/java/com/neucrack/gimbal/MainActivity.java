@@ -53,6 +53,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         mStatusPage = new FragmentStatus();
+        mControlPage = new FragmentControl();
+        mSettingsPage  = new FragmentSettings();
         transaction.replace(R.id.fragment_content, mStatusPage);
         transaction.commit();
 
@@ -114,8 +116,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                 int sum=0;
                                 for(int j=0;j<frameLength-1;++j)
                                     sum+=(mReceivedBuffer[j]&0xff);
-                                sum%=256;
-                                if(sum == mReceivedBuffer[frameLength-1])
+                                sum&=0xff;
+                                if(sum == (mReceivedBuffer[frameLength-1]&0xff))
                                     dealMessageFrame(mReceivedBuffer);
                                 //将已经处理过的帧从缓冲区删除
                                 for (int j = 0; j < mReceivedBufferIndex + 1 - frameLength; ++j)
@@ -148,7 +150,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if (mStatusConnectedToServer == -1) {//未连接
                     mStatusConnectedToServer = 1;//标志正在连接
                     showHintConnecting(mStatusConnectedToServer);
-                    WifiSocketManager.getInstance().connect(8090);
+                    WifiSocketManager.getInstance().connect(8080);
                 }
                 try {
                     Thread.sleep(5000);
@@ -180,21 +182,25 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     public void dealMessageFrame(byte[] messageFrame) {
         int contentLength = (messageFrame[3]&0xff);
-        for(int i=0;i<contentLength +5;++i){
-            Log.v("a",(messageFrame[i]&0xff)+"");
-        }
         switch ((messageFrame[2]&0xff)){
             case 1://姿态数据
                 if(contentLength>=6)
-                    mStatusPage.showAngle( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0, ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff))/100.0, ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff))/100.0 );
-                if(contentLength>=12)
-                    mControlPage.showArm(((messageFrame[11]&0xff)>0?true:false));
+                    mStatusPage.showAngle( ((messageFrame[4])<<8|(messageFrame[5]&0xff))/100.0, ((messageFrame[6])<<8|(messageFrame[7]&0xff))/100.0, ((messageFrame[8])<<8|(messageFrame[9]&0xff))/100.0 );
+//                if(contentLength>=12)
+//                    mControlPage.showArm(((messageFrame[11]&0xff)>0?true:false));
                 break;
             case 2://传感器数据
-                if(contentLength>=18)
-                    mStatusPage.showRawData( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0, ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff))/100.0, ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff))/100.0,
-                            ((messageFrame[10]&0xff)<<8|(messageFrame[11]&0xff)), ((messageFrame[12]&0xff)<<8|(messageFrame[13]&0xff)), ((messageFrame[14]&0xff)<<8|(messageFrame[15]&0xff)),
-                            ((messageFrame[16]&0xff)<<8|(messageFrame[17]&0xff)), ((messageFrame[18]&0xff)<<8|(messageFrame[19]&0xff)), ((messageFrame[20]&0xff)<<8|(messageFrame[21]&0xff)) );
+                if(contentLength>=18) {
+                    double ax,ay,az;
+                    ax =((messageFrame[4]) << 8 | (messageFrame[5] & 0xff)) / 100.0;
+                    ay =((messageFrame[6]) << 8 | (messageFrame[7] & 0xff)) / 100.0;
+                    az =((messageFrame[8]) << 8 | (messageFrame[9] & 0xff)) / 100.0;
+                    if(ax==0&&ay==0&&az==0)
+                        Log.v("b",".....acc 0,0,0");
+                    mStatusPage.showRawData(ax,ay,az,
+                            ((messageFrame[10]) << 8 | (messageFrame[11] & 0xff)), ((messageFrame[12]) << 8 | (messageFrame[13] & 0xff)), ((messageFrame[14]) << 8 | (messageFrame[15] & 0xff)),
+                            ((messageFrame[16]) << 8 | (messageFrame[17] & 0xff)), ((messageFrame[18]) << 8 | (messageFrame[19] & 0xff)), ((messageFrame[20]) << 8 | (messageFrame[21] & 0xff)));
+                }
                 break;
             case 3://遥控数据
                 if(contentLength>=8)
@@ -202,11 +208,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case 5://电压数据
                 if(contentLength>=2)
-                    mStatusPage.showVoltage(((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff))/100.0);
+                    mStatusPage.showVoltage(((messageFrame[4])<<8|(messageFrame[5]&0xff))/100.0);
                 break;
             case 6://电机数据
-                if(contentLength>=6)
-                    mStatusPage.showMotor( ((messageFrame[4]&0xff)<<8|(messageFrame[5]&0xff)), ((messageFrame[6]&0xff)<<8|(messageFrame[7]&0xff)), ((messageFrame[8]&0xff)<<8|(messageFrame[9]&0xff)) );
+
+                if(contentLength>=6) {
+                    mStatusPage.showMotor(((messageFrame[4]) << 8 | (messageFrame[5] & 0xff)), ((messageFrame[6]) << 8 | (messageFrame[7] & 0xff)), ((messageFrame[8]) << 8 | (messageFrame[9] & 0xff)));
+                }
                 break;
         }
     }

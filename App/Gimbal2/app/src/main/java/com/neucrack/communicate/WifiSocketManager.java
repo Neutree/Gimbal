@@ -122,7 +122,7 @@ public class WifiSocketManager {
 	            	{
 	            		try
 	                    {
-	                    	Log.i("TAG", "开始连接");
+							Log.i("TAG", "开始连接,ip:"+ipAddress+"  端口："+port);
 	                        mSocketClient = new Socket(ipAddress,port);
 							IsConnected = true;
 							Log.i("TAG", "已连接,ip:"+ipAddress+"  端口："+port);

@@ -40,6 +40,7 @@ public class FragmentStatus extends Fragment {
         View view = inflater.inflate(R.layout.fragment_fragment_status, container, false);
         mAngleRoll = (TextView) view.findViewById(R.id.textView_angle_roll);
         mAnglePitch = (TextView) view.findViewById(R.id.textView_angle_pitch);
+        mAngleYaw =  (TextView) view.findViewById(R.id.textView_angle_yaw);
         mAccX = (TextView) view.findViewById(R.id.textView_acc_x);
         mAccY = (TextView) view.findViewById(R.id.textView_acc_y);
         mAccZ = (TextView) view.findViewById(R.id.textView_acc_z);
@@ -82,16 +83,17 @@ public class FragmentStatus extends Fragment {
     };
 
     public void showRawData(double acc_x, double acc_y, double acc_z, int gryo_x, int gryo_y, int gryo_z, int mag_x, int mag_y, int mag_z) {
+
         Bundle data = new Bundle();
         data.putDouble("acc_x",acc_x);
         data.putDouble("acc_y",acc_y);
         data.putDouble("acc_z",acc_z);
-        data.putDouble("gyro_x",gryo_x);
-        data.putDouble("gyro_y",gryo_y);
-        data.putDouble("gyro_z",gryo_z);
-        data.putDouble("mag_x",mag_x);
-        data.putDouble("mag_y",mag_y);
-        data.putDouble("mag_z",mag_z);
+        data.putInt("gyro_x",gryo_x);
+        data.putInt("gyro_y",gryo_y);
+        data.putInt("gyro_z",gryo_z);
+        data.putInt("mag_x",mag_x);
+        data.putInt("mag_y",mag_y);
+        data.putInt("mag_z",mag_z);
         Message msg = new Message();
         msg.setData(data);
         setRawData.sendMessage(msg);
@@ -101,9 +103,9 @@ public class FragmentStatus extends Fragment {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             Bundle data = msg.getData();
+            double acc_z = data.getDouble("acc_z",0);
             double acc_x = data.getDouble("acc_x",0);
             double acc_y = data.getDouble("acc_y",0);
-            double acc_z = data.getDouble("acc_z",0);
             int gyro_x = data.getInt("gyro_x",0);
             int gyro_y = data.getInt("gyro_y",0);
             int gyro_z = data.getInt("gyro_z",0);
@@ -150,7 +152,7 @@ public class FragmentStatus extends Fragment {
         data.putInt("yaw",motor_yaw);
         Message msg = new Message();
         msg.setData(data);
-        setRawData.sendMessage(msg);
+        setMotor .sendMessage(msg);
     }
 
     Handler setMotor = new Handler(){
