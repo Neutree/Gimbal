@@ -5,10 +5,11 @@
     android:orientation="vertical"
     android:weightSum="2"
     tools:context="com.neucrack.gimbal.FragmentSettings">
-
-
-
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_weight="1" >
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -146,7 +147,7 @@
                 android:id="@+id/editText_PID_yaw_D" />
         </TableRow>
     </TableLayout>
-
+    </ScrollView>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
