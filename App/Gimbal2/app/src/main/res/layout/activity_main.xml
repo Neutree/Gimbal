@@ -8,37 +8,41 @@
         android:id="@+id/button_panel"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:weightSum="3"
         android:background="@drawable/ripple_bg"
-        android:clipToPadding="true"
-        android:fitsSystemWindows="true">
+        >
+    <!--android:clipToPadding="true"-->
+    <!--android:fitsSystemWindows="true"-->
 
-        <Button
+        <TextView
             android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:text="状态"
+            android:clickable="true"
             android:id="@+id/button_status"
-            android:layout_gravity="bottom"
+            android:gravity="bottom|center"
             android:background="@drawable/ripple_bg"
             android:textColor="#ffffff" />
-        <Button
+        <TextView
             android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:clickable="true"
+            android:gravity="bottom|center"
+            android:layout_height="match_parent"
             android:text="控制"
             android:id="@+id/button_control"
-            android:layout_gravity="bottom"
             android:background="@drawable/ripple_bg"
             android:textColor="#ffffff" />
-        <Button
+        <TextView
             android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:clickable="true"
+            android:gravity="bottom|center"
+            android:layout_height="match_parent"
             android:text=" 设置"
             android:id="@+id/button_settings"
-            android:layout_gravity="bottom"
             android:background="@drawable/ripple_bg"
             android:textColor="#ffffff" />
 

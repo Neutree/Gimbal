@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neucrack.communicate.WifiSocketManager;
@@ -26,7 +27,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private FragmentControl mControlPage;
     private FragmentSettings mSettingsPage;
 
-    private Button mButtonStatus,mButtonControl,mButtonSettings;
+    private TextView mButtonStatus,mButtonControl,mButtonSettings;
 
     private byte mReceivedBuffer[] = new byte[2048];
     private int mReceivedBufferIndex = -1;
@@ -42,9 +43,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         Log.v("a","onCreate");
         setContentView(R.layout.activity_main);
 
-        mButtonStatus = (Button) findViewById(R.id.button_status);
-        mButtonControl = (Button) findViewById(R.id.button_control);
-        mButtonSettings = (Button) findViewById(R.id.button_settings);
+        mButtonStatus = (TextView) findViewById(R.id.button_status);
+        mButtonControl = (TextView) findViewById(R.id.button_control);
+        mButtonSettings = (TextView) findViewById(R.id.button_settings);
         mButtonStatus.setOnClickListener(this);
         mButtonControl.setOnClickListener(this);
         mButtonSettings.setOnClickListener(this);
