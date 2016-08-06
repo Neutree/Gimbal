@@ -176,8 +176,8 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 	{
 		if(*(data_buf+4)==0X01)
 		{
-			ANO_DT_Send_PID(1,mGimbal.mPIDRoll.mKp,mGimbal.mPIDRoll.mKi,mGimbal.mPIDRoll.mKd,
-							  mGimbal.mPIDPitch.mKp,mGimbal.mPIDPitch.mKd,mGimbal.mPIDPitch.mKd,
+			ANO_DT_Send_PID(1,mGimbal.mPIDRoll.mKp*1000,mGimbal.mPIDRoll.mKi*1000,mGimbal.mPIDRoll.mKd*1000,
+							  mGimbal.mPIDPitch.mKp*1000,mGimbal.mPIDPitch.mKi*1000,mGimbal.mPIDPitch.mKd*1000,
 							  mGimbal.mPIDYaw.mKp*1000,mGimbal.mPIDYaw.mKi*1000,mGimbal.mPIDYaw.mKd*1000);
 		}
 		if(*(data_buf+4)==0X02)
@@ -196,19 +196,19 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 	
 	if(*(data_buf+2)==0X03)//目标角度控制
 	{		
-		mGimbal.mTargetAngle.x = ((( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ) -1000)/2.77778 - 180)*RtA;
-		mGimbal.mTargetAngle.y = ((( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) )-1000)/2.77778 - 180)*RtA;
-		mGimbal.mTargetAngle.z = ((( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) )-1000)/2.77778 - 180)*RtA;
+		mGimbal.mTargetAngle.x = -( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) )*AtR;
+		mGimbal.mTargetAngle.y = ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) )*AtR;
+		mGimbal.mTargetAngle.z = ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) )*AtR;
 	}
 
 	if(*(data_buf+2)==0X10)								//PID1
     {
-        data.mPIDRoll.SetKp( ( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) ));
-        data.mPIDRoll.SetKi( ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) ));
-        data.mPIDRoll.SetKd(  ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) ));
-        data.mPIDPitch.SetKp( ( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ));
-        data.mPIDPitch.SetKi( ( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) ));
-        data.mPIDPitch.SetKd( ( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) ));
+        data.mPIDRoll.SetKp( ( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) )/1000.0);
+        data.mPIDRoll.SetKi( ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) )/1000.0);
+        data.mPIDRoll.SetKd(  ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) )/1000.0);
+        data.mPIDPitch.SetKp( ( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) )/1000.0);
+        data.mPIDPitch.SetKi( ( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) )/1000.0);
+        data.mPIDPitch.SetKd( ( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) )/1000.0);
         data.mPIDYaw.SetKp(( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) )/1000.0);
         data.mPIDYaw.SetKi( ( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) )/1000.0);
         data.mPIDYaw.SetKd( ( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) )/1000.0);

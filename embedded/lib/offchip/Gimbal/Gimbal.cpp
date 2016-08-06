@@ -166,12 +166,12 @@ bool Gimbal::SaveParam2Flash()
 	u16 data[20];
 	data[0] = 0x00aa;
 	data[1] = 0x00bb;
-	data[2] = mPIDRoll.mKp;
-	data[3] = mPIDRoll.mKi;
-	data[4] = mPIDRoll.mKd;
-	data[5] = mPIDPitch.mKp;
-	data[6] = mPIDPitch.mKi;
-	data[7] = mPIDPitch.mKd;
+	data[2] = mPIDRoll.mKp*1000;
+	data[3] = mPIDRoll.mKi*1000;
+	data[4] = mPIDRoll.mKd*1000;
+	data[5] = mPIDPitch.mKp*1000;
+	data[6] = mPIDPitch.mKi*1000;
+	data[7] = mPIDPitch.mKd*1000;
 	data[8] = mPIDYaw.mKp*1000;
 	data[9] = mPIDYaw.mKi*1000;
 	data[10] = mPIDYaw.mKd*1000;
@@ -198,15 +198,15 @@ bool Gimbal::ReadPIDParam2Flash()
 		return false;
 	if(data[0]!=0x00aa || data[1]!=0x00bb)
 		return false;
-	mPIDRoll.SetKp(data[2]);
-	mPIDRoll.SetKi(data[3]);
-	mPIDRoll.SetKd(data[4]);
-	mPIDPitch.SetKp(data[5]);
-	mPIDPitch.SetKi(data[6]);
-	mPIDPitch.SetKd(data[7]);
-	mPIDYaw.SetKp(data[8]);
-	mPIDYaw.SetKi(data[9]);
-	mPIDYaw.SetKd(data[10]);
+	mPIDRoll.SetKp(data[2]/1000.0);
+	mPIDRoll.SetKi(data[3]/1000.0);
+	mPIDRoll.SetKd(data[4]/1000.0);
+	mPIDPitch.SetKp(data[5]/1000.0);
+	mPIDPitch.SetKi(data[6]/1000.0);
+	mPIDPitch.SetKd(data[7]/1000.0);
+	mPIDYaw.SetKp(data[8]/1000.0);
+	mPIDYaw.SetKi(data[9]/1000.0);
+	mPIDYaw.SetKd(data[10]/1000.0);
 	return true;
 }
 bool Gimbal::ReadGyroOffset2Flash()
@@ -254,12 +254,12 @@ bool Gimbal::ReadParam2Flash()
 		return false;
 	if(data[0]!=0x00aa || data[1]!=0x00bb)
 		return false;
-	mPIDRoll.SetKp(data[2]);
-	mPIDRoll.SetKi(data[3]);
-	mPIDRoll.SetKd(data[4]);
-	mPIDPitch.SetKp(data[5]);
-	mPIDPitch.SetKi(data[6]);
-	mPIDPitch.SetKd(data[7]);
+	mPIDRoll.SetKp(data[2]/1000.0);
+	mPIDRoll.SetKi(data[3]/1000.0);
+	mPIDRoll.SetKd(data[4]/1000.0);
+	mPIDPitch.SetKp(data[5]/1000.0);
+	mPIDPitch.SetKi(data[6]/1000.0);
+	mPIDPitch.SetKd(data[7]/1000.0);
 	mPIDYaw.SetKp(data[8]/1000.0);
 	mPIDYaw.SetKi(data[9]/1000.0);
 	mPIDYaw.SetKd(data[10]/1000.0);

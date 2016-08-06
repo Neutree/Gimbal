@@ -39,9 +39,9 @@ LED ledRed(ledRedGPIO);//LED red
 LED ledBlue(ledBlueGPIO);//LED blue
 
 //BLDC Motor
-BLDCMotor motorRoll(&pwm2,1,&pwm2,2,&pwm2,3,0.6);  //roll motor
+BLDCMotor motorRoll(&pwm2,1,&pwm2,2,&pwm2,3,0.7);  //roll motor
 BLDCMotor motorPitch(&pwm2,4,&pwm3,1,&pwm3,2,0.45); //pitch motor
-BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.55);   //yaw motor
+BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.3);   //yaw motor
 
 
 /**************************************************************************/
@@ -82,7 +82,7 @@ void loop()
 	ledBlue.Blink(0,0.5,false);
 	
 	//更新姿态、控制电机，500Hz
-	if(tskmgr.TimeSlice(record_tmgTest,0.001)) //每0.002秒执行一次
+	if(tskmgr.TimeSlice(record_tmgTest,0.002)) //每0.01秒执行一次
 	{
 		gimbal.UpdateIMU();//更新姿态
 		gimbal.UpdateMotor(&motorValueRoll,&motorValuePitch,&motorValueYaw);//控制电机
@@ -125,8 +125,16 @@ int main()
 {
 	TaskManager::DelayMs(500);//延时，等待传感器上电自启动完毕
 	init();	
+	float a=13.56,c=0,d[2];
+	u16* b = (u16*)&a;
+	com<<(int)d<<"\t"<<(int)&d[1]<<"\n";
 	while(1)
 	{
+		infoStore.Write(0,50,b,2);
+//		infoStore.Read(0,50,b,2);
+//		c = (float)*b;
+//		com<<c<<"\n";
+//		TaskManager::DelayMs(800);
 		loop();
 	}
 }

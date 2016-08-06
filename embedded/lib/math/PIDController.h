@@ -10,6 +10,7 @@ private:
 	float _Perr;
 	float _Ierr;
 	float _Derr;
+	float mOut;
 
 public:
 	PIDController(float kp=0, float ki=0, float kd=0)
@@ -17,21 +18,27 @@ public:
 		mKp = kp;
 		mKi = ki;
 		mKd = kd;
+		mOut = 0;
 	}
 	void operator()(float kp, float ki, float kd)
 	{
 		mKp = kp;  
 		mKi = ki;  
 		mKd = kd; 
+		mOut = 0;
 	}
 	float Controll(float target, float now)
 	{
+		
 		float err = target - now;
 		
-		float detaI = err*mKi;
-		
-		if(detaI>10)  detaI = 10; 
-		if(detaI<-10) detaI = -10;
+		float detaI = 0;
+		if(err>-0.087&&err<0.087)// 误差小于5度，进行积分，否则将积分快速衰减掉
+			detaI = err*mKi/100.0;
+		else
+			detaI /=10.0;
+		if(detaI>0.5)  detaI = 0.5; 
+		if(detaI<-0.5) detaI = -0.5;
 			
 		_Ierr += detaI;
 		_Derr =  (err -_Perr);
@@ -42,7 +49,8 @@ public:
 //			count = 0;
 //			DEBUG_LOG<<"tar:"<<target<<"\tnow:"<<now<<"\terror:"<<err<<"\tdetaI:"<<detaI<<"\t_Ierr:"<<_Ierr<<"\t_Ddrr:"<<_Derr<<"\tout:"<<1000*err <<"\n";
 //		}
-		return mKp*_Perr + _Ierr + mKd*_Derr;
+		mOut += mKp*_Perr + _Ierr + mKd*_Derr;
+		return mOut;
 	}
 	void AddKp(float value)
 	{
