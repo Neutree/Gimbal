@@ -89,7 +89,7 @@ void loop()
 	}
 	
 	//输出电源值和飞机姿态数据、电机数据。12.5Hz
-	if(tskmgr.TimeSlice(record_tmgTest2,0.08)) 
+	if(tskmgr.TimeSlice(record_tmgTest2,0.2)) 
 	{
 //		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
 //		{
@@ -108,7 +108,7 @@ void loop()
 //			LOG("..");
 	}
 	
-	if(tskmgr.TimeSlice(record_tmgTest3,1)) 
+	if(tskmgr.TimeSlice(record_tmgTest3,2)) 
 	{
 		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
 		{
@@ -125,16 +125,8 @@ int main()
 {
 	TaskManager::DelayMs(500);//延时，等待传感器上电自启动完毕
 	init();	
-	float a=13.56,c=0,d[2];
-	u16* b = (u16*)&a;
-	com<<(int)d<<"\t"<<(int)&d[1]<<"\n";
 	while(1)
 	{
-		infoStore.Write(0,50,b,2);
-//		infoStore.Read(0,50,b,2);
-//		c = (float)*b;
-//		com<<c<<"\n";
-//		TaskManager::DelayMs(800);
 		loop();
 	}
 }
