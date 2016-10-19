@@ -33,9 +33,9 @@ ADC voltage(4); //读取电压值
 flash infoStore(0x08000000+63*MEMORY_PAGE_SIZE,true);     //flash
 
 //LED
-GPIO ledRedGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);//LED GPIO
+GPIO ledGreenGPIO(GPIOB,0,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);//LED GPIO
 GPIO ledBlueGPIO(GPIOB,1,GPIO_Mode_Out_PP,GPIO_Speed_50MHz);//LED GPIO
-LED ledRed(ledRedGPIO);//LED red
+LED ledGreen(ledGreenGPIO);//LED red
 LED ledBlue(ledBlueGPIO);//LED blue
 
 //BLDC Motor
@@ -63,7 +63,7 @@ Communicate communicate(gimbal,com);
 void init()
 {
 	ledBlue.On();
-	ledRed.Off();
+	ledGreen.Off();
 	gimbal.Init();
 	gimbal.mIsArmed = true;
 }
@@ -93,7 +93,7 @@ void loop()
 	{
 //		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
 //		{
-			ledRed.Toggle();
+			ledGreen.Toggle();
 			communicate.ANO_DT_Send_Status(gimbal.mAngle.y*RtA,gimbal.mAngle.x*RtA,gimbal.mAngle.z*RtA,0,1,gimbal.mIsArmed);
 			//communicate.ANO_DT_Send_MotoPWM(motorValueRoll%256+256,motorValuePitch%256+256,motorValueYaw%256+256,0,0,0,0,0);
 			communicate.ANO_DT_Send_MotoPWM(motorValueRoll,motorValuePitch,motorValueYaw,0,0,0,0,0);

@@ -3,7 +3,11 @@ package com.neucrack.communicate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,17 +37,17 @@ public class WifiSocketManager {
 	/**
 	 * Socket套接字
 	 */
-	private Socket mSocketClient = null;
-	
+	//private Socket mSocketClient = null;
+	private DatagramSocket ds = null;
 	/**
 	 * Socket输入流
 	 */
-    private InputStream mReadBuffer=null;
+  //  private InputStream mReadBuffer=null;
     
     /**
      * Socket输出流
      */
-    private OutputStream mWriteBuffer = null; 
+  //  private OutputStream mWriteBuffer = null;
     
     /**
      * Socket通道是否连接成功标志
@@ -64,7 +68,8 @@ public class WifiSocketManager {
 	 * 连接情况的回调函数
 	 */
 	private ConnectionCallBack connectionCallBack;
-	
+
+	int mPort;
 	/**
 	 * 接发送信息回调函数
 	 */
@@ -93,6 +98,11 @@ public class WifiSocketManager {
 		
 		dhcpinfo = wifiManager.getDhcpInfo();
 		ipAddress = intToIp(dhcpinfo.serverAddress);
+		try {
+			ds = new DatagramSocket(8080);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -122,12 +132,17 @@ public class WifiSocketManager {
 	            	{
 	            		try
 	                    {
+							mPort = port;
 							Log.i("TAG", "开始连接,ip:"+ipAddress+"  端口："+port);
-	                        mSocketClient = new Socket(ipAddress,port);
+	                        //mSocketClient = new Socket(ipAddress,port);
+							byte[] sendbuffer = new byte[1];
+							DatagramPacket dp = new DatagramPacket(sendbuffer, sendbuffer.length, InetAddress.getByName(ipAddress), port);
+							ds.send(dp);
+
 							IsConnected = true;
 							Log.i("TAG", "已连接,ip:"+ipAddress+"  端口："+port);
-							mReadBuffer =mSocketClient.getInputStream();
-							mWriteBuffer = mSocketClient.getOutputStream();
+							//mReadBuffer =mSocketClient.getInputStream();
+							//mWriteBuffer = mSocketClient.getOutputStream();
 							if(connectionCallBack!=null)
 							{
 								connectionCallBack.onConnected();
@@ -139,7 +154,7 @@ public class WifiSocketManager {
 	                    	Log.i("TAG", "catch IsConnected "+String.valueOf(IsConnected));
 	                    	if (connectionCallBack != null){
     							connectionCallBack.onDisConnected();
-    						}
+    						}/*
 	                        if (mSocketClient != null)
 	                        {
 	                            try
@@ -153,7 +168,7 @@ public class WifiSocketManager {
 	                            }
 	                            Log.i("TAG", "");
 	                            return;
-	                        }
+	                        }*/
 							return;
 	                    }
 	            	}
@@ -163,10 +178,12 @@ public class WifiSocketManager {
 	            while (true)
 	            {
 	                try {
-						if((count = mReadBuffer.read(bytedata))!=-1)
+						DatagramPacket dp = new DatagramPacket(bytedata, bytedata.length);
+						ds.receive(dp);
+						if(dp.getLength()>0)
 						{
-							byte Data[] = new byte[count];
-							for (int i = 0; i < count; i++){
+							byte Data[] = new byte[dp.getLength()];
+							for (int i = 0; i < dp.getLength(); i++){
 									Data[i] = bytedata[i];
 						        }
 								if (messageCallBack != null){
@@ -199,13 +216,15 @@ public class WifiSocketManager {
     {
       	try {
       		if(CheckSum(sendbuffer,sendbuffer.length))
-      		{
+      		{/*
 				if(mWriteBuffer==null){
 					messageCallBack.onSendFail();
 					return;
 				}
-
-      			mWriteBuffer.write(sendbuffer);
+*/
+//      			mWriteBuffer.write(sendbuffer);
+				DatagramPacket dp = new DatagramPacket(sendbuffer, sendbuffer.length, InetAddress.getByName(ipAddress), mPort);
+				ds.send(dp);
       			if(messageCallBack!=null){
       				messageCallBack.onSendSeccess();
       			}
