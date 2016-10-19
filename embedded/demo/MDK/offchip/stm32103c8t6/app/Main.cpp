@@ -89,7 +89,7 @@ void loop()
 	}
 	
 	//输出电源值和飞机姿态数据、电机数据。12.5Hz
-	if(tskmgr.TimeSlice(record_tmgTest2,0.2)) 
+	if(tskmgr.TimeSlice(record_tmgTest2,0.1)) 
 	{
 //		if(gimbal.IsGyroCalibrated() && gimbal.IsMagCalibrated())//已经校准完毕
 //		{
@@ -97,7 +97,7 @@ void loop()
 			communicate.ANO_DT_Send_Status(gimbal.mAngle.y*RtA,gimbal.mAngle.x*RtA,gimbal.mAngle.z*RtA,0,1,gimbal.mIsArmed);
 			//communicate.ANO_DT_Send_MotoPWM(motorValueRoll%256+256,motorValuePitch%256+256,motorValueYaw%256+256,0,0,0,0,0);
 			communicate.ANO_DT_Send_MotoPWM(motorValueRoll,motorValuePitch,motorValueYaw,0,0,0,0,0);
-			communicate.ANO_DT_Send_Power(gimbal.UpdateVoltage(4,5.1,1,12)*100,0);
+			//communicate.ANO_DT_Send_Power(gimbal.UpdateVoltage(4,5.1,1,12)*100,0);
 			if(!gimbal.IsMagCalibrated())
 				communicate.ANO_DT_Send_Senser(mpu6050.GetAcc().x*1000,mpu6050.GetAcc().y*1000,mpu6050.GetAcc().z*1000,mpu6050.GetGyrRaw().x,mpu6050.GetGyrRaw().y,mpu6050.GetGyrRaw().z,mag.xMaxMinusMin,mag.yMaxMinusMin,mag.zMaxMinusMin,0);
 			else

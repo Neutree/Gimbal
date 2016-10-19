@@ -124,7 +124,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                                 for (int j = 0; j < mReceivedBufferIndex + 1 - frameLength; ++j)
                                     mReceivedBuffer[j] = mReceivedBuffer[frameLength + j];
                                 mReceivedBufferIndex -= frameLength;
-                                i = 0;
+                                i = -1;
                             } else//长度不够
                                 return;
                         }

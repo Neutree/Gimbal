@@ -29,9 +29,9 @@
   */
 /******************************************************************************************************/
 							/****configuration，使用前请自行配置****/
-		#define USART_TX_BUFFER_SIZE     256              //USART BUFFER FIFO SIZE
-		#define USART_RX_BUFFER_SIZE     256              //USART BUFFER FIFO SIZE
-		#define USART_DMA_TX_BUFFER_SIZE 20             //USART DMA BUFFER SIZE
+		#define USART_TX_BUFFER_SIZE     1024              //USART BUFFER FIFO SIZE
+		#define USART_RX_BUFFER_SIZE     1024              //USART BUFFER FIFO SIZE
+		#define USART_DMA_TX_BUFFER_SIZE 50                //USART DMA BUFFER SIZE
 		
 /*******************************************************************************************************/
 
