@@ -8,6 +8,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,7 +39,7 @@ public class WifiSocketManager {
 	 * Socket套接字
 	 */
 	//private Socket mSocketClient = null;
-	private DatagramSocket ds = null;
+	private DatagramSocket mDSocket = null;
 	/**
 	 * Socket输入流
 	 */
@@ -99,7 +100,7 @@ public class WifiSocketManager {
 		dhcpinfo = wifiManager.getDhcpInfo();
 		ipAddress = intToIp(dhcpinfo.serverAddress);
 		try {
-			ds = new DatagramSocket(8080);
+			mDSocket = new DatagramSocket(8080);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -135,9 +136,9 @@ public class WifiSocketManager {
 							mPort = port;
 							Log.i("TAG", "开始连接,ip:"+ipAddress+"  端口："+port);
 	                        //mSocketClient = new Socket(ipAddress,port);
-							byte[] sendbuffer = new byte[1];
+							byte[] sendbuffer = new byte[5];
 							DatagramPacket dp = new DatagramPacket(sendbuffer, sendbuffer.length, InetAddress.getByName(ipAddress), port);
-							ds.send(dp);
+							mDSocket.send(dp);
 
 							IsConnected = true;
 							Log.i("TAG", "已连接,ip:"+ipAddress+"  端口："+port);
@@ -179,7 +180,7 @@ public class WifiSocketManager {
 	            {
 	                try {
 						DatagramPacket dp = new DatagramPacket(bytedata, bytedata.length);
-						ds.receive(dp);
+						mDSocket.receive(dp);
 						if(dp.getLength()>0)
 						{
 							byte Data[] = new byte[dp.getLength()];
@@ -212,30 +213,38 @@ public class WifiSocketManager {
      * 发送数据到模块
      * @param sendbuffer 需要发送的字节数组
      */
-    public void SendData(byte[] sendbuffer)
+    public void SendData(final byte[] sendbuffer)
     {
-      	try {
-      		if(CheckSum(sendbuffer,sendbuffer.length))
-      		{/*
-				if(mWriteBuffer==null){
-					messageCallBack.onSendFail();
-					return;
-				}
+		if(CheckSum(sendbuffer,sendbuffer.length))
+        {/*
+          if(mWriteBuffer==null){
+              messageCallBack.onSendFail();
+              return;
+          }
 */
 //      			mWriteBuffer.write(sendbuffer);
-				DatagramPacket dp = new DatagramPacket(sendbuffer, sendbuffer.length, InetAddress.getByName(ipAddress), mPort);
-				ds.send(dp);
-      			if(messageCallBack!=null){
-      				messageCallBack.onSendSeccess();
-      			}
-      		}
-		} catch (IOException e) {
-			e.printStackTrace();
-			if(messageCallBack!=null){
-  				messageCallBack.onSendFail();
-  			}
-		}
-    }
+          new Thread(new Runnable() {
+              @Override
+              public void run() {
+                  DatagramPacket dp = null;
+                  try {
+                      dp = new DatagramPacket(sendbuffer, sendbuffer.length, InetAddress.getByName(ipAddress), mPort);
+                  } catch (UnknownHostException e) {
+                      e.printStackTrace();
+                  }
+                  try {
+					  mDSocket.send(dp);
+                  } catch (IOException e) {
+                      e.printStackTrace();
+                  }
+                  if(messageCallBack!=null){
+                      messageCallBack.onSendSeccess();
+                  }
+              }
+          }).start();
+
+        }
+	}
 	
     /**
      * 校验和
