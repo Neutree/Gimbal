@@ -29,6 +29,10 @@ JLinkSettings.ini
 *.dep
 *.uvoptx
 *.*.bak
+*.log
+
+#PCB
+__Previews
 
 
 ProjectTemplate
