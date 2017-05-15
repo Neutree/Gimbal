@@ -100,7 +100,7 @@ public class WifiSocketManager {
 		dhcpinfo = wifiManager.getDhcpInfo();
 		ipAddress = intToIp(dhcpinfo.serverAddress);
 		try {
-			mDSocket = new DatagramSocket(8080);
+			mDSocket = new DatagramSocket(8000);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -215,6 +215,10 @@ public class WifiSocketManager {
      */
     public void SendData(final byte[] sendbuffer)
     {
+		if(!IsConnected) {
+			Log.i("TAG", "not connected,will not send");
+			return;
+		}
 		if(CheckSum(sendbuffer,sendbuffer.length))
         {/*
           if(mWriteBuffer==null){

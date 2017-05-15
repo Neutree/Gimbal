@@ -65,11 +65,11 @@ public class FragmentControl extends Fragment {
             //mTextView.layout();
             if(!mIsAllowSend)
                 return;
-            mTextView.setText(mName+"  "+ (int)(progress*3.6-180) + "°");
+            mTextView.setText(mName+"  "+ (int)(progress*1.78-89) + "°");
             byte[] dataToSend = new byte[25];
-            int roll = (int)( mSeekBarRoll.getProgress()*3.6-180);
-            int pitch = (int)( mSeekBarPitch.getProgress()*3.6-180);
-            int yaw = (int)( mSeekBarYaw.getProgress()*3.6-180);
+            int roll = (int)( mSeekBarRoll.getProgress()*1.78-89);
+            int pitch = (int)( mSeekBarPitch.getProgress()*1.78-89);
+            int yaw = (int)( mSeekBarYaw.getProgress()*1.78-89);
             dataToSend[0] = (byte) 0xaa;
             dataToSend[1] = (byte) 0xaf;
             dataToSend[2] = (byte) 0x03;

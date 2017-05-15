@@ -26,8 +26,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private FragmentStatus mStatusPage;
     private FragmentControl mControlPage;
     private FragmentSettings mSettingsPage;
+    private FragmentWiFiSettings mWiFiSetingsPage;
 
-    private TextView mButtonStatus,mButtonControl,mButtonSettings;
+    private TextView mButtonStatus,mButtonControl,mButtonSettings,mButtonWiFiSettings;
 
     private byte mReceivedBuffer[] = new byte[2048];
     private int mReceivedBufferIndex = -1;
@@ -46,9 +47,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mButtonStatus = (TextView) findViewById(R.id.button_status);
         mButtonControl = (TextView) findViewById(R.id.button_control);
         mButtonSettings = (TextView) findViewById(R.id.button_settings);
+        mButtonWiFiSettings = (TextView) findViewById(R.id.button_wifi_settings);
         mButtonStatus.setOnClickListener(this);
         mButtonControl.setOnClickListener(this);
         mButtonSettings.setOnClickListener(this);
+        mButtonWiFiSettings.setOnClickListener(this);
 
         //初始页面
         FragmentManager fm = getSupportFragmentManager();
@@ -56,8 +59,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mStatusPage = new FragmentStatus();
         mControlPage = new FragmentControl();
         mSettingsPage  = new FragmentSettings();
+        mWiFiSetingsPage = new FragmentWiFiSettings();
         transaction.replace(R.id.fragment_content, mStatusPage);
         transaction.commit();
+        mButtonStatus.setTextSize(18);
+        mButtonControl.setTextSize(14);
+        mButtonSettings.setTextSize(14);
+        mButtonWiFiSettings.setTextSize(14);
 
         WifiSocketManager.getInstance().init(getApplicationContext());
         mIsProgramExit = false;
@@ -151,7 +159,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if (mStatusConnectedToServer == -1) {//未连接
                     mStatusConnectedToServer = 1;//标志正在连接
                     showHintConnecting(mStatusConnectedToServer);
-                    WifiSocketManager.getInstance().connect(8080);
+                    WifiSocketManager.getInstance().connect(8000);
                 }
                 try {
                     Thread.sleep(5000);
@@ -234,25 +242,25 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if(mStatusPage==null)
                     mStatusPage = new FragmentStatus();
                 transaction.replace(R.id.fragment_content,mStatusPage);
-                mButtonStatus.setTextSize(18);
-                mButtonControl.setTextSize(14);
-                mButtonSettings.setTextSize(14);
+                hilightItem(1);
                 break;
             case R.id.button_control:
                 if(mControlPage==null)
                     mControlPage = new FragmentControl();
                 transaction.replace(R.id.fragment_content,mControlPage);
-                mButtonStatus.setTextSize(14);
-                mButtonControl.setTextSize(18);
-                mButtonSettings.setTextSize(14);
+               hilightItem(2);
                 break;
             case R.id.button_settings:
                 if(mSettingsPage==null)
                     mSettingsPage = new FragmentSettings();
                 transaction.replace(R.id.fragment_content,mSettingsPage);
-                mButtonStatus.setTextSize(14);
-                mButtonControl.setTextSize(14);
-                mButtonSettings.setTextSize(18);
+                hilightItem(3);
+                break;
+            case R.id.button_wifi_settings:
+                if(mWiFiSetingsPage==null)
+                    mWiFiSetingsPage = new FragmentWiFiSettings();
+                transaction.replace(R.id.fragment_content,mWiFiSetingsPage);
+                hilightItem(4);
                 break;
             default:
                 break;
@@ -266,5 +274,33 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         Log.v("a","onDestroy");
         mIsProgramExit = true;
         mConnectionThread = null;
+    }
+    protected void hilightItem(int item){
+        switch (item){
+            case 1:
+                mButtonStatus.setTextSize(18);
+                mButtonControl.setTextSize(14);
+                mButtonSettings.setTextSize(14);
+                mButtonWiFiSettings.setTextSize(14);
+                break;
+            case 2:
+                mButtonStatus.setTextSize(14);
+                mButtonControl.setTextSize(18);
+                mButtonSettings.setTextSize(14);
+                mButtonWiFiSettings.setTextSize(14);
+                break;
+            case 3:
+                mButtonStatus.setTextSize(14);
+                mButtonControl.setTextSize(14);
+                mButtonSettings.setTextSize(18);
+                mButtonWiFiSettings.setTextSize(14);
+                break;
+            case 4:
+                mButtonStatus.setTextSize(14);
+                mButtonControl.setTextSize(14);
+                mButtonSettings.setTextSize(14);
+                mButtonWiFiSettings.setTextSize(18);
+                break;
+        }
     }
 }

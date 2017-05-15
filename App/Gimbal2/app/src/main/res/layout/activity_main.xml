@@ -9,7 +9,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:weightSum="3"
+        android:weightSum="4"
         android:background="@drawable/ripple_bg"
         >
     <!--android:clipToPadding="true"-->
@@ -41,11 +41,20 @@
             android:clickable="true"
             android:gravity="bottom|center"
             android:layout_height="match_parent"
-            android:text=" 设置"
+            android:text=" 参数设置"
             android:id="@+id/button_settings"
             android:background="@drawable/ripple_bg"
             android:textColor="#ffffff" />
-
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:clickable="true"
+            android:gravity="bottom|center"
+            android:layout_height="match_parent"
+            android:text=" WiFi设置"
+            android:id="@+id/button_wifi_settings"
+            android:background="@drawable/ripple_bg"
+            android:textColor="#ffffff" />
 
     </LinearLayout>
     <RelativeLayout
