@@ -13,7 +13,10 @@ bool Gimbal::Init()
 	mIns.Init();
 	//初始化磁力计
 	if(!mMag->Init())
+	{
 		LOG("magnetometer error!!!!\n");
+		return false;
+	}
 	
 	//从flash中读取参数
 	if(!ReadParam2Flash())

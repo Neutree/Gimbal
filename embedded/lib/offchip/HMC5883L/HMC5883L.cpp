@@ -29,7 +29,10 @@ bool HMC5883L::Init(bool wait)
 		mI2C->WaitTransmitComplete();
 	//测试磁力计是否存在
 	if(!TestConnection(false))
+	{
 		DEBUG_LOG<<"mag connection error\n";
+		return false;
+	}
 	
 	unsigned char IIC_Write_Temp;
 	IIC_Write_Temp = HMC5883L_AVERAGING_8 | HMC5883L_RATE_75 | HMC5883L_BIAS_NORMAL;   
