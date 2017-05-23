@@ -8,6 +8,7 @@
 #include "AHRS_Algorithm.h"
 #include "ADC.h"
 #include "Flash.h"
+#include "parameter.h"
 
 #include "Configuration.h"
 
@@ -21,7 +22,7 @@ private:
 	BLDCMotor& mMotorPitch;
 	BLDCMotor& mMotorYaw;
 	ADC& mADC;
-	flash& mFlash;
+	parameter mParameter;
 
 	AHRS_Algorithm mAHRS_Algorithm;
 	

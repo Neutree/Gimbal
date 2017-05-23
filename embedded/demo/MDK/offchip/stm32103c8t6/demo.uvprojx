@@ -370,10 +370,10 @@
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--gnu</MiscControls>
               <Define>STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\lib\math;..\..\..\..\lib\onchip\ADC;..\..\..\..\lib\onchip\capture;..\..\..\..\lib\onchip\delay;..\..\..\..\lib\onchip\EXTI;..\..\..\..\lib\onchip\flash;..\..\..\..\lib\onchip\GPIO;..\..\..\..\lib\onchip\I2C;..\..\..\..\lib\onchip\interrupt;..\..\..\..\lib\onchip\PWM;..\..\..\..\lib\onchip\taskManager;..\..\..\..\lib\onchip\timer;..\..\..\..\lib\onchip\USART;.\app;..\..\..\..\lib\offchip\LED;..\..\..\..\lib\offchip\MPU6050;..\..\..\..\lib\offchip\HMC5883L;..\..\..\..\lib\offchip\Sensor;..\..\..\..\lib\offchip\BLDCMotor;..\..\..\..\lib\offchip\Gimbal;..\..\..\..\lib\offchip\esp8266</IncludePath>
+              <IncludePath>..\..\..\..\lib\math;..\..\..\..\lib\onchip\ADC;..\..\..\..\lib\onchip\capture;..\..\..\..\lib\onchip\delay;..\..\..\..\lib\onchip\EXTI;..\..\..\..\lib\onchip\flash;..\..\..\..\lib\onchip\GPIO;..\..\..\..\lib\onchip\I2C;..\..\..\..\lib\onchip\interrupt;..\..\..\..\lib\onchip\PWM;..\..\..\..\lib\onchip\taskManager;..\..\..\..\lib\onchip\timer;..\..\..\..\lib\onchip\USART;.\app;..\..\..\..\lib\offchip\LED;..\..\..\..\lib\offchip\MPU6050;..\..\..\..\lib\offchip\HMC5883L;..\..\..\..\lib\offchip\Sensor;..\..\..\..\lib\offchip\BLDCMotor;..\..\..\..\lib\offchip\esp8266</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -529,7 +529,12 @@
             <File>
               <FileName>Gimbal.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\lib\offchip\Gimbal\Gimbal.cpp</FilePath>
+              <FilePath>.\app\Gimbal.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>parameter.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\app\parameter.cpp</FilePath>
             </File>
           </Files>
         </Group>
