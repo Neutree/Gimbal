@@ -1,22 +1,21 @@
 #include "Gimbal.h"
 
 
-Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,flash& flash_)
-:mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mParameter(flash_),mIsGyroCalibrating(false)
+Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,uint8_t voltageChannel,uint8_t yawResChannel,flash& flash_)
+:mIns(ins),mMag(&mag),mMotorRoll(motorRoll),mMotorPitch(motorPitch),mMotorYaw(motorYaw),mADC(adc),mParameter(flash_),mVoltageChannel(voltageChannel),mYawValueChannel(yawResChannel),mIsGyroCalibrating(false),mYawMode(1)
 {
 	mIsArmed = false;
 	mTargetAngle(0,0,0);
 }
-bool Gimbal::Init()
+bool Gimbal::Init(uint8_t yawSensorType)
 {
 	float time = TaskManager::Time();
-	mIns.Init();
+	bool isInitSuccess=true;
+	if(!mIns.Init(true))
+		isInitSuccess = false;
 	//初始化磁力计
-	if(!mMag->Init())
-	{
-		LOG("magnetometer error!!!!\n");
-		return false;
-	}
+	if(!mMag->Init(true))
+		isInitSuccess = false;
 	
 	//从flash中读取参数
 	if(!ReadParam2Flash())
@@ -30,10 +29,9 @@ bool Gimbal::Init()
 		//保存信息到flash
 		SaveParam2Flash();
 	}
-	mMotorRoll.Enable();
-	mMotorPitch.Enable();
-	mMotorYaw.Enable();
-	return true;
+	CheckMotorDisable();
+	mYawSensorType = yawSensorType;
+	return isInitSuccess;
 }
 bool Gimbal::UpdateIMU()
 {
@@ -71,6 +69,19 @@ bool Gimbal::UpdateIMU()
 	{		
 		mAngle = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(), mMag->GetDataRaw(),mIns.GetUpdateInterval());
 
+		if(mYawSensorType==1)//电位器+磁力计
+		{
+			if(mYawMode == 2)//静止模式
+				mAngle.z = GetYawValue()/(2.3-0.35)*260.0;
+			else if(mYawSensorType == 2)//跟随模式
+			{
+				
+			}
+			else if(mYawSensorType ==  3)//绝对静止模式
+			{
+				
+			}
+		}
 		//根据传感器安装方位进行换向
 		mAngle.z = -mAngle.z;
 		mAngle.y>0?(mAngle.y-=180):(mAngle.y+=180);
@@ -84,7 +95,11 @@ bool Gimbal::UpdateIMU()
 	}
 	return true;
 }
-bool Gimbal::UpdateMotor(int* motorRoll,int* motorPitch, int* motorYaw)
+float Gimbal::GetYawValue()
+{
+	return mADC[mYawValueChannel];
+}
+bool Gimbal::UpdateMotor(int* motorRollValue,int* motorPitchValue, int* motorYawValue)
 {
 //	static int count = 0;
 //	if(++count>100)
@@ -94,25 +109,35 @@ bool Gimbal::UpdateMotor(int* motorRoll,int* motorPitch, int* motorYaw)
 //	}
 	int v = mPIDRoll.Controll(mTargetAngle.y,mAngle.y);
 	int v2 = mPIDPitch.Controll(mTargetAngle.x,mAngle.x);
-	int v3 = mPIDYaw.Controll(mTargetAngle.z,mAngle.z);
-
-	v2=-v2;
+	int v3=0;
+	if(mYawMode == 2)//相对静止模式
+		v3 = mPIDYaw.Controll(mTargetAngle.z,mAngle.z);
+	else if(mYawMode == 1)//跟随模式
+	{
+	}
+	else if(mYawMode == 3)//绝对静止模式
+	{
+		
+	}
 	v3=-v3;
-	mMotorRoll.SetPosition(v);
-	mMotorPitch.SetPosition(v2);
-	mMotorYaw.SetPosition(v3);
+	if(mMotorRoll.IsEnabled())
+		mMotorRoll.SetPosition(v);
+	if(mMotorPitch.IsEnabled())
+		mMotorPitch.SetPosition(v2);
+	if(mMotorYaw.IsEnabled())
+		mMotorYaw.SetPosition(v3);
 	
-	if(motorRoll!=0)
-		*motorRoll = v;
-	if(motorPitch!=0)
-		*motorPitch = v2;
-	if(motorYaw!=0)
-		*motorYaw = v3;
+	if(motorRollValue!=0)
+		*motorRollValue = v;
+	if(motorPitchValue!=0)
+		*motorPitchValue = v2;
+	if(motorYawValue!=0)
+		*motorYawValue = v3;
 	return true;
 }
-float Gimbal::UpdateVoltage(uint8_t channelNumber,float resister_a,float resister_b,float fullRange)
+float Gimbal::UpdateVoltage(float resister_a,float resister_b,float fullRange)
 {
-	return mADC.Voltage_I(channelNumber,resister_a,resister_b,fullRange);
+	return mADC.Voltage_I(mVoltageChannel,resister_a,resister_b,fullRange);
 }
 bool Gimbal::IsGyroCalibrated()
 {
@@ -163,7 +188,39 @@ void Gimbal::StartMagCalibrate()
 	mIsMagCalibrating = true;
 	LOG("magnetometer is calibrating ... don't move!!!\n");
 }
-
+void Gimbal::CheckMotorDisable()
+{
+	if(mMotorRoll.IsEnabled())
+	{
+		if(mPIDRoll.mKp==0 && mPIDRoll.mKi==0 && mPIDRoll.mKd==0)
+			mMotorRoll.Disable();
+	}
+	else
+	{
+		if(mPIDRoll.mKp!=0 || mPIDRoll.mKi!=0 || mPIDRoll.mKd!=0)
+			mMotorRoll.Enable();
+	}
+	if(mMotorPitch.IsEnabled())
+	{
+		if(mPIDPitch.mKp==0 && mPIDPitch.mKi==0 && mPIDPitch.mKd==0)
+			mMotorPitch.Disable();
+	}
+	else
+	{
+		if(mPIDPitch.mKp!=0 || mPIDPitch.mKi!=0 || mPIDPitch.mKd!=0)
+			mMotorPitch.Enable();
+	}
+	if(mMotorYaw.IsEnabled())
+	{
+		if(mPIDYaw.mKp==0 && mPIDYaw.mKi==0 && mPIDYaw.mKd==0)
+			mMotorYaw.Disable();
+	}
+	else
+	{
+		if(mPIDYaw.mKp!=0 || mPIDYaw.mKi!=0 || mPIDYaw.mKd!=0)
+			mMotorYaw.Enable();
+	}
+}
 bool Gimbal::SaveParam2Flash()
 {
 	// u16 data[20];
@@ -190,9 +247,9 @@ bool Gimbal::SaveParam2Flash()
 	// mFlash.Clear(0);
 	// if(!mFlash.Write(0,0,data,20))
 	// 	return false;
-	// ReadParam2Flash();	
-	mParameter.SaveParam2Flash(mPIDRoll,mPIDPitch,mPIDYaw,mIns.GetGyrOffset(),mMag->GetOffsetRatio(),mMag->GetOffsetBias());
-	return true;
+	// ReadParam2Flash();
+	CheckMotorDisable();
+	return mParameter.SaveParam2Flash(mPIDRoll,mPIDPitch,mPIDYaw,mIns.GetGyrOffset(),mMag->GetOffsetRatio(),mMag->GetOffsetBias());
 }
 
 bool Gimbal::ReadPIDParam2Flash()
@@ -283,9 +340,11 @@ bool Gimbal::ReadParam2Flash()
 	// mMag->SetOffsetBias(magOffsetBias.x,magOffsetBias.y,magOffsetBias.z);
 	Vector3<int> gyroOffset;
 	Vector3f magOffsetRatio,magOffsetBias;
-	mParameter.ReadParamFromFlash(mPIDRoll,mPIDPitch,mPIDYaw,gyroOffset,magOffsetRatio,magOffsetBias);
+	if(!mParameter.ReadParamFromFlash(mPIDRoll,mPIDPitch,mPIDYaw,gyroOffset,magOffsetRatio,magOffsetBias))
+		return false;
 	mIns.SetGyrOffset(gyroOffset.x,gyroOffset.y,gyroOffset.z);
 	mMag->SetOffsetRatio(magOffsetRatio.x,magOffsetRatio.y,magOffsetRatio.z);
 	mMag->SetOffsetBias(magOffsetBias.x,magOffsetBias.y,magOffsetBias.z);
+	CheckMotorDisable();
 	return true;
 }

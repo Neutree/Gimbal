@@ -26,17 +26,24 @@ private:
 
 	AHRS_Algorithm mAHRS_Algorithm;
 	
+	uint8_t mVoltageChannel,mYawValueChannel;
 
 	bool mIsGyroCalibrating;
 	bool mIsMagCalibrating;
 
+
+	uint8_t mYawSensorType;//1:电位器+磁力计
+
 public:
 	Vector3f mAngle;
-	Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,flash&);
-	bool Init();
+	Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,uint8_t voltageChannel,uint8_t yawResChannel,flash&);
+	/**
+		*@param yawSensorType 1:电位器+磁力计  2:
+		*/
+	bool Init(uint8_t yawSensorType);
 	bool UpdateIMU();
 	bool UpdateMotor(int* motorRoll = 0,int* motorPitch = 0, int* motorYaw = 0);
-	float UpdateVoltage(uint8_t channelNumber,float resister_a,float resister_b,float fullRange);
+	float UpdateVoltage(float resister_a,float resister_b,float fullRange);
 	bool IsGyroCalibrated();
 	bool IsGyroCalibrating();
 	void StartGyroCalibrate();
@@ -44,6 +51,7 @@ public:
 	bool IsMagCalibrating();
 	void StartMagCalibrate();
 
+	void CheckMotorDisable();
 	bool ReadGyroOffset2Flash();
 	bool ReadMagOffset2Flash();
 	bool ReadPIDParam2Flash();
@@ -51,11 +59,13 @@ public:
 
 	bool SaveParam2Flash();
 	
+	float GetYawValue();
 
 	PIDController mPIDRoll,mPIDPitch,mPIDYaw;
 
 	bool mIsArmed;
 	Vector3f mTargetAngle;
+	uint8_t mYawMode;//航向模式 1:跟随模式 2：静止模式 3：绝对静止模式（相对于地球磁场方向静止）
 };
 
 #endif

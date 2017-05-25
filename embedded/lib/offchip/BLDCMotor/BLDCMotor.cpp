@@ -70,6 +70,10 @@ void BLDCMotor::Disable()
 	_pwm_b->SetDuty(_ch_b,0);
 	_pwm_c->SetDuty(_ch_c,0);
 }
+bool BLDCMotor::IsEnabled()
+{
+	return _armed;
+}
 
 
 

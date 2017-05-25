@@ -33,6 +33,9 @@ JLinkSettings.ini
 
 #PCB
 __Previews
+*.PcbDoc.htm
+*.OutJob
+*.PRJPCBStructure
 
 
 ProjectTemplate

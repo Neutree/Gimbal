@@ -24,6 +24,7 @@ class BLDCMotor
 		void SetPosition(int pos);
 		void Enable();
 		void Disable();
+		bool IsEnabled();
 };
 
 #endif
