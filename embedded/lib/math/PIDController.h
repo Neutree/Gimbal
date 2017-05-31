@@ -1,7 +1,6 @@
 #ifndef __PIDCONTROLLER_H
 #define __PIDCONTROLLER_H
 #include "Configuration.h"
-
 class PIDController
 {
 private:
@@ -33,10 +32,8 @@ public:
 		float err = target - now;
 		
 		float detaI = 0;
-		if(err>-0.087&&err<0.087)// 误差小于5度，进行积分，否则将积分快速衰减掉
+//		if(err>-0.087&&err<0.087)// 误差小于5度，进行积分，否则将积分快速衰减掉
 			detaI = err*mKi/100.0;
-		else
-			detaI /=10.0;
 		if(detaI>0.5)  detaI = 0.5; 
 		if(detaI<-0.5) detaI = -0.5;
 			
@@ -49,7 +46,7 @@ public:
 //			count = 0;
 //			DEBUG_LOG<<"tar:"<<target<<"\tnow:"<<now<<"\terror:"<<err<<"\tdetaI:"<<detaI<<"\t_Ierr:"<<_Ierr<<"\t_Ddrr:"<<_Derr<<"\tout:"<<1000*err <<"\n";
 //		}
-		mOut += mKp*_Perr + _Ierr + mKd*_Derr;
+		mOut += mKp*_Perr + _Ierr + mKd*100*_Derr;
 		return mOut;
 	}
 	void AddKp(float value)
@@ -87,6 +84,13 @@ public:
 	void SetKd(float value)
 	{
 		mKd = value;
+	}
+	void Clear()
+	{
+		_Perr = 0;
+		_Ierr = 0;
+		_Derr = 0;
+		mOut  = 0;
 	}
 	
 public:

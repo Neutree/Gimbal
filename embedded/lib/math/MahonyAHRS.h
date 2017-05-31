@@ -3,7 +3,7 @@
 #include "math.h"
 #include "Vector3.h"
 
-#define RtA 		57.324841f	//角度转弧度制			
+#define RtA 		57.324841f	//弧度制转为角度
 
 
 class MahonyAHRS

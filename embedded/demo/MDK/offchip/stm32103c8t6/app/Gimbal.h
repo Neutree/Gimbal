@@ -36,6 +36,7 @@ private:
 
 public:
 	Vector3f mAngle;
+	float mYawAngleRes;
 	Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,uint8_t voltageChannel,uint8_t yawResChannel,flash&);
 	/**
 		*@param yawSensorType 1:电位器+磁力计  2:

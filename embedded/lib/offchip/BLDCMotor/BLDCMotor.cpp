@@ -1,14 +1,14 @@
 #include "BLDCMotor.h"
 
 bool BLDCMotor::bInitSPWM = false;
-float BLDCMotor::SPWM[256] = {0};
+float BLDCMotor::SPWM[SPWM_PRECISION] = {0};
 
 
 void BLDCMotor::InitSPWM()
 {
-	for(int i=0;i<256;i++)
+	for(int i=0;i<SPWM_PRECISION;i++)
 	{
-		SPWM[i] = sin(i*2.0*3.1415926/256.0);
+		SPWM[i] = sin(i*2.0*3.1415926/SPWM_PRECISION);
 	}
 }
 
@@ -45,11 +45,11 @@ void BLDCMotor::SetPosition(int position)
 	if(!_armed) return;
 	float a,b,c;
 	
-	u16 pos = position & 0xFF;
+	u16 pos = position % SPWM_PRECISION;
 	
-	a = SPWM[pos%256];
-	b = SPWM[(pos+85)%256];
-	c = SPWM[(pos+170)%256];
+	a = SPWM[pos%SPWM_PRECISION];
+	b = SPWM[(int)(pos+SPWM_PRECISION/3.0)%SPWM_PRECISION];
+	c = SPWM[(int)(pos+SPWM_PRECISION/3.0*2)%SPWM_PRECISION];
 
 	a = (_maxPower*a + 1.0)/2.0; 
 	b = (_maxPower*b + 1.0)/2.0; 

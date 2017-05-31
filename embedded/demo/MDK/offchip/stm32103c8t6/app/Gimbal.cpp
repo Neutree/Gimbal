@@ -31,6 +31,8 @@ bool Gimbal::Init(uint8_t yawSensorType)
 	}
 	CheckMotorDisable();
 	mYawSensorType = yawSensorType;
+	if(mYawSensorType == 1)
+		mYawAngleRes = GetYawValue()/(2.3-0.35)*260.0 ;
 	return isInitSuccess;
 }
 bool Gimbal::UpdateIMU()
@@ -72,7 +74,11 @@ bool Gimbal::UpdateIMU()
 		if(mYawSensorType==1)//电位器+磁力计
 		{
 			if(mYawMode == 2)//静止模式
-				mAngle.z = GetYawValue()/(2.3-0.35)*260.0;
+			{
+				
+				mYawAngleRes = mYawAngleRes*0.95 + ( GetYawValue()/(2.3-0.35)*260.0 )*0.05;
+				mAngle.z = mYawAngleRes;
+			}
 			else if(mYawSensorType == 2)//跟随模式
 			{
 				
@@ -101,15 +107,10 @@ float Gimbal::GetYawValue()
 }
 bool Gimbal::UpdateMotor(int* motorRollValue,int* motorPitchValue, int* motorYawValue)
 {
-//	static int count = 0;
-//	if(++count>100)
-//	{
-//		count =0;
-//		LOG("roll:");
-//	}
-	int v = mPIDRoll.Controll(mTargetAngle.y,mAngle.y);
-	int v2 = mPIDPitch.Controll(mTargetAngle.x,mAngle.x);
-	int v3=0;
+	static int v=0,v2=0,v3=0;
+	//增量式PID控制
+	v  = mPIDRoll.Controll(mTargetAngle.y,mAngle.y);
+	v2 = mPIDPitch.Controll(mTargetAngle.x,mAngle.x);
 	if(mYawMode == 2)//相对静止模式
 		v3 = mPIDYaw.Controll(mTargetAngle.z,mAngle.z);
 	else if(mYawMode == 1)//跟随模式
@@ -193,7 +194,10 @@ void Gimbal::CheckMotorDisable()
 	if(mMotorRoll.IsEnabled())
 	{
 		if(mPIDRoll.mKp==0 && mPIDRoll.mKi==0 && mPIDRoll.mKd==0)
+		{
+			mPIDRoll.Clear();
 			mMotorRoll.Disable();
+		}
 	}
 	else
 	{
@@ -203,7 +207,10 @@ void Gimbal::CheckMotorDisable()
 	if(mMotorPitch.IsEnabled())
 	{
 		if(mPIDPitch.mKp==0 && mPIDPitch.mKi==0 && mPIDPitch.mKd==0)
+		{
+			mPIDPitch.Clear();
 			mMotorPitch.Disable();
+		}
 	}
 	else
 	{
@@ -213,7 +220,10 @@ void Gimbal::CheckMotorDisable()
 	if(mMotorYaw.IsEnabled())
 	{
 		if(mPIDYaw.mKp==0 && mPIDYaw.mKi==0 && mPIDYaw.mKd==0)
+		{
+			mPIDYaw.Clear();
 			mMotorYaw.Disable();
+		}
 	}
 	else
 	{

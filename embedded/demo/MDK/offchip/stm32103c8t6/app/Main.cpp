@@ -23,7 +23,7 @@
 USART com(1,115200,false);
 I2C i2c2(2); 
 mpu6050 mpu6050(i2c2,100);
-HMC5883L mag(i2c2,500);
+HMC5883L mag(i2c2,10);
 PWM pwm2(TIM2,1,1,1,1,20000);  //开启时钟2的4个通道，频率2Whz
 PWM pwm3(TIM3,1,1,0,0,20000);  //开启时钟3的2个通道，频率2Whz
 PWM pwm4(TIM4,1,1,1,0,20000);  //开启时钟4的3个通道，频率2Whz
@@ -40,9 +40,9 @@ LED ledGreen(ledGreenGPIO);//LED red
 LED ledBlue(ledBlueGPIO);//LED blue
 
 //BLDC Motor
-BLDCMotor motorRoll(&pwm2,1,&pwm2,2,&pwm2,3,0.7);  //roll motor
+BLDCMotor motorRoll(&pwm2,1,&pwm2,2,&pwm2,3,0.6);  //roll motor
 BLDCMotor motorPitch(&pwm2,4,&pwm3,1,&pwm3,2,0.45); //pitch motor
-BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.3);   //yaw motor
+BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.55);   //yaw motor
 
 
 /**************************************************************************/

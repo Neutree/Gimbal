@@ -3,11 +3,13 @@
 #include "PWM.h"
 #include "math.h"
 
+#define SPWM_PRECISION 1024
+
 class BLDCMotor
 {
 	private:
 		static bool bInitSPWM;
-		static float SPWM[256];
+		static float SPWM[SPWM_PRECISION];
 		PWM *_pwm_a;
 		PWM *_pwm_b;
 		PWM *_pwm_c;
