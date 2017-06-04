@@ -3,7 +3,7 @@
 #include "math.h"
 #include "Vector3.h"
 
-#define RtA 		57.324841f	//弧度制转为角度
+#define RtA 		57.295780f	//弧度制转为角度 1/pi*180
 
 
 class MahonyAHRS
@@ -209,7 +209,7 @@ public:
 	{
 		Vector3f angle;
 		
-		MahonyAHRSupdate(gyro.x,gyro.y,gyro.z,acc.x,acc.y,acc.z,mag.x,mag.y,mag.z,mKp,mKi,deltaT);		
+		MahonyAHRSupdate(gyro.x,gyro.y,gyro.z,acc.x,acc.y,acc.z,mag.x,mag.y,mag.z,mKp,mKi,deltaT);
 		
 		angle.x = asin(-2 * q1 * q3 + 2 * q0* q2)* RtA; // pitch
 		angle.y = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* RtA; // roll

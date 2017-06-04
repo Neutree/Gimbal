@@ -35,7 +35,7 @@ private:
 	uint8_t mYawSensorType;//1:电位器+磁力计
 
 public:
-	Vector3f mAngle;
+	Vector3f mAngle,mAngle2;
 	float mYawAngleRes;
 	Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMotor& motorPitch,BLDCMotor& motorYaw,ADC& adc,uint8_t voltageChannel,uint8_t yawResChannel,flash&);
 	/**

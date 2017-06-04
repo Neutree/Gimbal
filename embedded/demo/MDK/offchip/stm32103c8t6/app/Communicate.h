@@ -34,7 +34,7 @@ public:
 	void ANO_DT_Send_Power(u16 votage, u16 current);
 	
 	void ANO_DT_Send_PID(u8 group,float p1_p,float p1_i,float p1_d,float p2_p,float p2_i,float p2_d,float p3_p,float p3_i,float p3_d);
-		
+	void SendDebugInfo(char*);
 	//从App接收到的数据处理函数
 	void ANO_DT_Data_Receive_Deal(Gimbal&);
 };

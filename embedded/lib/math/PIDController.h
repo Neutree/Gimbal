@@ -28,26 +28,17 @@ public:
 	}
 	float Controll(float target, float now)
 	{
-		
-		float err = target - now;
-		
-		float detaI = 0;
-//		if(err>-0.087&&err<0.087)// 误差小于5度，进行积分，否则将积分快速衰减掉
-			detaI = err*mKi/100.0;
-		if(detaI>0.5)  detaI = 0.5; 
-		if(detaI<-0.5) detaI = -0.5;
+			float err = target - now;
 			
-		_Ierr += detaI;
-		_Derr =  (err -_Perr);
-		_Perr = err;
-//		static int count=0;
-//		if(++count>100)
-//		{
-//			count = 0;
-//			DEBUG_LOG<<"tar:"<<target<<"\tnow:"<<now<<"\terror:"<<err<<"\tdetaI:"<<detaI<<"\t_Ierr:"<<_Ierr<<"\t_Ddrr:"<<_Derr<<"\tout:"<<1000*err <<"\n";
-//		}
-		mOut += mKp*_Perr + _Ierr + mKd*100*_Derr;
-		return mOut;
+			float detaI = err*mKi;
+			
+			if(detaI>10)  detaI = 10; 
+		  if(detaI<-10) detaI = -10;
+				
+			_Ierr += detaI;
+			_Derr =  (err -_Perr);
+			_Perr = err;
+			return mKp*_Perr + _Ierr + mKd*_Derr;
 	}
 	void AddKp(float value)
 	{

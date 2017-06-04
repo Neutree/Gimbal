@@ -15,13 +15,12 @@ public:
 		mDCMMatrix.b.y=1;
 		mDCMMatrix.c.z=1;
 	}
-	Vector3f GetAngle_InertialSensor(Vector3<int> acc,Vector3f gyro,float updateInterval)
+	/**
+		*@param acc: unit:m/s2
+    *@param gyro： unit:rad/s
+		**/
+	Vector3f GetAngle_InertialSensor(Vector3<float> acc,Vector3f gyro,float updateInterval)
 	{
-//		Vector3f acc ;
-//		acc.x = acc_.x;
-//		acc.y = acc_.y;
-//		acc.z = acc_.z;
-//		com<<acc.x<<"\t"<<acc.y<<"\t"<<acc.z<<"\t"<<gyro.x<<"\t"<<gyro.y<<"\t"<<gyro.z<<"\n";
 		Vector3f delta = gyro*updateInterval;
 		delta.x = -delta.x;
 	
@@ -40,8 +39,8 @@ public:
 			mDCMVector.z = mDCMVector.z*(1-accFilter) - acc.z*accFilter;
 		}
 		
-		mAngle.x = atan2f(mDCMVector.x, sqrtf(mDCMVector.y*mDCMVector.y+mDCMVector.z*mDCMVector.z))*57.29f;
-		mAngle.y = atan2f(mDCMVector.y,mDCMVector.z)*57.29f;
+		mAngle.y = atan2f(mDCMVector.x, sqrtf(mDCMVector.y*mDCMVector.y+mDCMVector.z*mDCMVector.z))*57.29f;
+		mAngle.x = -atan2f(mDCMVector.y,mDCMVector.z)*57.29f;
 		return mAngle;
 	}
 	

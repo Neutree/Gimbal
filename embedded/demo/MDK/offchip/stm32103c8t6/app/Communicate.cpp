@@ -1,4 +1,5 @@
 #include "Communicate.h"
+#include "string.h"
 
 void Communicate::ANO_DT_Send_Status(float angle_rol, float angle_pit, float angle_yaw, s32 alt, u8 fly_model, u8 armed)
 {
@@ -176,9 +177,9 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 	{
 		if(*(data_buf+4)==0X01)
 		{
-			ANO_DT_Send_PID(1,mGimbal.mPIDRoll.mKp*1000,mGimbal.mPIDRoll.mKi*1000,mGimbal.mPIDRoll.mKd*1000,
-							  mGimbal.mPIDPitch.mKp*1000,mGimbal.mPIDPitch.mKi*1000,mGimbal.mPIDPitch.mKd*1000,
-							  mGimbal.mPIDYaw.mKp*1000,mGimbal.mPIDYaw.mKi*1000,mGimbal.mPIDYaw.mKd*1000);
+			ANO_DT_Send_PID(1,mGimbal.mPIDRoll.mKp,mGimbal.mPIDRoll.mKi,mGimbal.mPIDRoll.mKd,
+							  mGimbal.mPIDPitch.mKp,mGimbal.mPIDPitch.mKi,mGimbal.mPIDPitch.mKd,
+							  mGimbal.mPIDYaw.mKp,mGimbal.mPIDYaw.mKi,mGimbal.mPIDYaw.mKd);
 		}
 		if(*(data_buf+4)==0X02)
 		{
@@ -203,15 +204,15 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 
 	if(*(data_buf+2)==0X10)								//PID1
     {
-        data.mPIDRoll.SetKp( ( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) )/1000.0);
-        data.mPIDRoll.SetKi( ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) )/1000.0);
-        data.mPIDRoll.SetKd(  ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) )/1000.0);
-        data.mPIDPitch.SetKp( ( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) )/1000.0);
-        data.mPIDPitch.SetKi( ( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) )/1000.0);
-        data.mPIDPitch.SetKd( ( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) )/1000.0);
-        data.mPIDYaw.SetKp(( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) )/1000.0);
-        data.mPIDYaw.SetKi( ( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) )/1000.0);
-        data.mPIDYaw.SetKd( ( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) )/1000.0);
+        data.mPIDRoll.SetKp( ( (vs16)(*(data_buf+4)<<8)|*(data_buf+5) ));
+        data.mPIDRoll.SetKi( ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) ));
+        data.mPIDRoll.SetKd(  ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) ));
+        data.mPIDPitch.SetKp( ( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) ));
+        data.mPIDPitch.SetKi( ( (vs16)(*(data_buf+12)<<8)|*(data_buf+13) ));
+        data.mPIDPitch.SetKd( ( (vs16)(*(data_buf+14)<<8)|*(data_buf+15) ));
+        data.mPIDYaw.SetKp(( (vs16)(*(data_buf+16)<<8)|*(data_buf+17) ));
+        data.mPIDYaw.SetKi( ( (vs16)(*(data_buf+18)<<8)|*(data_buf+19) ));
+        data.mPIDYaw.SetKd( ( (vs16)(*(data_buf+20)<<8)|*(data_buf+21) ));
         ANO_DT_Send_Check(*(data_buf+2),sum);
 		data.SaveParam2Flash();
     }
@@ -426,6 +427,21 @@ void Communicate::ANO_DT_Send_PID(u8 group,float p1_p,float p1_i,float p1_d,floa
 	mCom.SendData(data_to_send, _cnt);
 }
 
+void Communicate::SendDebugInfo(char* dataToSend)
+{
+	u8 _cnt=0;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xEE;
+	for(uint16_t i=0;i<strlen(dataToSend);++i)
+		data_to_send[_cnt++] = dataToSend[i];
+	u8 sum = 0;
+	for(u8 i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	mCom.SendData(data_to_send, _cnt);
+}
 
 
 

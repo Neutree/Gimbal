@@ -67,16 +67,16 @@ bool Gimbal::UpdateIMU()
 		SaveParam2Flash();
 	}
 	
-	if(mIns.IsGyroCalibrated()&&mMag->IsCalibrated())//角速度和磁力计已经校准了
+	if(mIns.IsGyroCalibrated())//角速度和磁力计已经校准了
 	{		
-		mAngle = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(), mMag->GetDataRaw(),mIns.GetUpdateInterval());
-
-		if(mYawSensorType==1)//电位器+磁力计
+		if(mYawSensorType==1)//电位器+加速度角速度计
 		{
+			Vector3<int> mag0(0,0,0);
+//			mAngle2 = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(),mag0,mIns.GetUpdateInterval());
+			mAngle = mAHRS_Algorithm.GetAngleDCM(mIns.GetAcc(),mIns.GetGyr(),mIns.GetUpdateInterval());
 			if(mYawMode == 2)//静止模式
 			{
-				
-				mYawAngleRes = mYawAngleRes*0.95 + ( GetYawValue()/(2.3-0.35)*260.0 )*0.05;
+				mYawAngleRes = mYawAngleRes*0.98 + ( GetYawValue()/(2.3-0.35)*260.0 )*0.02;//高斯滤波
 				mAngle.z = mYawAngleRes;
 			}
 			else if(mYawSensorType == 2)//跟随模式
@@ -88,16 +88,22 @@ bool Gimbal::UpdateIMU()
 				
 			}
 		}
+		else if(mYawSensorType==2)//电位器+IMU+磁力计
+		{
+			if(mMag->IsCalibrated())
+			{
+					mAngle = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(), mMag->GetDataRaw(),mIns.GetUpdateInterval());
+			}
+		}
 		//根据传感器安装方位进行换向
 		mAngle.z = -mAngle.z;
-		mAngle.y>0?(mAngle.y-=180):(mAngle.y+=180);
-		mAngle.y = -mAngle.y;
+//		mAngle.y>0?(mAngle.y-=180):(mAngle.y+=180);
+//		mAngle.y = -mAngle.y;
 		mAngle.z>0?(mAngle.z-=180):(mAngle.z+=180);
 		
 		//转换为弧度
-		mAngle.x*=AtR;
-		mAngle.y*=AtR;
-		mAngle.z*=AtR;
+		mAngle*=AtR;
+//		mAngle2*=AtR;
 	}
 	return true;
 }
@@ -154,7 +160,7 @@ void Gimbal::StartGyroCalibrate()
 	mMotorPitch.Disable();
 	mMotorYaw.Disable();
 	float time = TaskManager::Time();
-	while(TaskManager::Time()-time<2)
+	while(TaskManager::Time()-time<2.5)
 	{
 		if(MOD_ERROR== mIns.Update())
 		{

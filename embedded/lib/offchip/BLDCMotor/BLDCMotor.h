@@ -3,7 +3,7 @@
 #include "PWM.h"
 #include "math.h"
 
-#define SPWM_PRECISION 1024
+#define SPWM_PRECISION 256
 
 class BLDCMotor
 {

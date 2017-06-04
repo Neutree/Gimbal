@@ -22,8 +22,8 @@
 //Timer T1(TIM1,1,2,3); //使用定时器计，溢出时间:1S+2毫秒+3微秒
 USART com(1,115200,false);
 I2C i2c2(2); 
-mpu6050 mpu6050(i2c2,100);
-HMC5883L mag(i2c2,10);
+mpu6050 mpu6050(i2c2,1000);
+HMC5883L mag(i2c2,1000);
 PWM pwm2(TIM2,1,1,1,1,20000);  //开启时钟2的4个通道，频率2Whz
 PWM pwm3(TIM3,1,1,0,0,20000);  //开启时钟3的2个通道，频率2Whz
 PWM pwm4(TIM4,1,1,1,0,20000);  //开启时钟4的3个通道，频率2Whz
@@ -41,7 +41,7 @@ LED ledBlue(ledBlueGPIO);//LED blue
 
 //BLDC Motor
 BLDCMotor motorRoll(&pwm2,1,&pwm2,2,&pwm2,3,0.6);  //roll motor
-BLDCMotor motorPitch(&pwm2,4,&pwm3,1,&pwm3,2,0.45); //pitch motor
+BLDCMotor motorPitch(&pwm2,4,&pwm3,1,&pwm3,2,0.4); //pitch motor
 BLDCMotor motorYaw(&pwm4,1,&pwm4,2,&pwm4,3,0.55);   //yaw motor
 
 
@@ -88,7 +88,7 @@ void loop()
 	//系统运行指示灯，1s闪烁一次
 	ledBlue.Blink(0,0.5,false);
 	//更新姿态、控制电机，500Hz
- 	if(tskmgr.TimeSlice(updateSlice,0.002)) //每0.01秒执行一次
+ 	if(tskmgr.TimeSlice(updateSlice,0.002)) //每0.002秒(500Hz)执行一次
  	{
  		gimbal.UpdateIMU();//更新姿态
  		gimbal.UpdateMotor(&motorValueRoll,&motorValuePitch,&motorValueYaw);//控制电机
