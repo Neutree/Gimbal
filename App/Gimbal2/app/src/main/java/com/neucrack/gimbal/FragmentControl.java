@@ -19,12 +19,6 @@ import org.w3c.dom.Text;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentControl.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link FragmentControl#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class FragmentControl extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -41,6 +35,7 @@ public class FragmentControl extends Fragment {
     private TextView mTextViewRoll,mTextViewYaw,mTextViewPitch;
     private Button mToZero;
     private boolean mIsAllowSend = false;
+    private int mProgressPitch=50,mProgressRoll=50,mProgressYaw=50;
 
 
     @Override
@@ -67,9 +62,13 @@ public class FragmentControl extends Fragment {
                 return;
             mTextView.setText(mName+"  "+ (int)(progress*1.78-89) + "°");
             byte[] dataToSend = new byte[25];
+            mProgressRoll  = mSeekBarRoll.getProgress();
+            mProgressPitch = mSeekBarPitch.getProgress();
+            mProgressYaw   = mSeekBarYaw.getProgress();
             int roll = (int)( mSeekBarRoll.getProgress()*1.78-89);
             int pitch = (int)( mSeekBarPitch.getProgress()*1.78-89);
             int yaw = (int)( mSeekBarYaw.getProgress()*1.78-89);
+            Log.v("test",roll+","+pitch+","+yaw);
             dataToSend[0] = (byte) 0xaa;
             dataToSend[1] = (byte) 0xaf;
             dataToSend[2] = (byte) 0x03;
@@ -110,19 +109,23 @@ public class FragmentControl extends Fragment {
         mTextViewYaw = (TextView) view.findViewById(R.id.textView_yaw);
         mTextViewPitch = (TextView) view.findViewById(R.id.textView_pitch);
         mToZero = (Button) view.findViewById(R.id.button_to_zero);
+        mSeekBarRoll.setProgress(mProgressRoll);
+        mSeekBarYaw.setProgress(mProgressYaw);
+        mSeekBarPitch.setProgress(mProgressPitch);
+        mTextViewRoll.setText("roll"+"  "+ (int)(mProgressRoll*1.78-89) + "°");
+        mTextViewPitch.setText("pitch"+"  "+ (int)(mProgressPitch*1.78-89) + "°");
+        mTextViewYaw.setText("yaw"+"  "+ (int)(mProgressYaw*1.78-89) + "°");
 
         mSeekBarRoll.setOnSeekBarChangeListener(new onSeekBarChangeListenerImp(mTextViewRoll,"roll"));
         mSeekBarYaw.setOnSeekBarChangeListener(new onSeekBarChangeListenerImp(mTextViewYaw,"yaw"));
         mSeekBarPitch.setOnSeekBarChangeListener(new onSeekBarChangeListenerImp(mTextViewPitch,"pitch"));
 
-
-        mSeekBarRoll.setProgress(50);
-        mSeekBarYaw.setProgress(50);
-        mSeekBarPitch.setProgress(50);
-
         mToZero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mProgressRoll = 50;
+                mProgressYaw = 50;
+                mProgressPitch = 50;
                 mSeekBarRoll.setProgress(50);
                 mSeekBarYaw.setProgress(50);
                 mSeekBarPitch.setProgress(50);
