@@ -94,6 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="置零"
+                android:textColor="#ffffff"
                 android:id="@+id/button_to_zero"
                 android:background="@drawable/ripple_bg_button"
                 android:layout_gravity="right|center_vertical" />
