@@ -6,6 +6,7 @@ Gimbal::Gimbal(InertialSensor& ins,Magnetometer& mag,BLDCMotor& motorRoll,BLDCMo
 {
 	mIsArmed = false;
 	mTargetAngle(0,0,0);
+	mTargetAngleTemp(0,0,0);
 }
 bool Gimbal::Init(uint8_t yawSensorType)
 {
@@ -71,19 +72,22 @@ bool Gimbal::UpdateIMU()
 	{		
 		if(mYawSensorType==1)//电位器+加速度角速度计
 		{
-			Vector3<int> mag0(0,0,0);
-//			mAngle2 = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(),mag0,mIns.GetUpdateInterval());
+//				mAngle = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(),mMag->GetDataRaw(),mIns.GetUpdateInterval());
+//			Vector3<int> mag0(0,0,0);
+//			mAngle = mAHRS_Algorithm.GetAngleMahony(mIns.GetAccRaw(),mIns.GetGyr(),mag0,mIns.GetUpdateInterval());
 			mAngle = mAHRS_Algorithm.GetAngleDCM(mIns.GetAcc(),mIns.GetGyr(),mIns.GetUpdateInterval());
 			if(mYawMode == 2)//静止模式
 			{
-				mYawAngleRes = mYawAngleRes*0.98 + ( GetYawValue()/(2.3-0.35)*260.0 )*0.02;//高斯滤波
+				mYawAngleRes = mYawAngleRes*0.998 + ( GetYawValue()/(2.3-0.35)*260.0 )*0.002;//高斯滤波
 				mAngle.z = mYawAngleRes;
 			}
-			else if(mYawSensorType == 2)//跟随模式
+			else if(mYawMode == 1)//跟随模式
 			{
-				
+
+				mYawAngleRes = mYawAngleRes*0.998 + ( GetYawValue()/(2.3-0.35)*260.0 )*0.002;//高斯滤波
+				mAngle.z = mYawAngleRes;
 			}
-			else if(mYawSensorType ==  3)//绝对静止模式
+			else if(mYawMode ==  3)//绝对静止模式
 			{
 				
 			}
@@ -114,13 +118,21 @@ float Gimbal::GetYawValue()
 bool Gimbal::UpdateMotor(int* motorRollValue,int* motorPitchValue, int* motorYawValue)
 {
 	static int v=0,v2=0,v3=0;
-	//增量式PID控制
-	v  = mPIDRoll.Controll(mTargetAngle.y,mAngle.y);
-	v2 = mPIDPitch.Controll(mTargetAngle.x,mAngle.x);
+	mTargetAngleTemp = mTargetAngleTemp*0.998 + mTargetAngle*0.002;
+	v  = mPIDRoll.Controll(mTargetAngleTemp.y,mAngle.y);
+	v2 = mPIDPitch.Controll(mTargetAngleTemp.x,mAngle.x);
 	if(mYawMode == 2)//相对静止模式
-		v3 = mPIDYaw.Controll(mTargetAngle.z,mAngle.z);
+		v3 = mPIDYaw.Controll(mTargetAngleTemp.z,mAngle.z);
 	else if(mYawMode == 1)//跟随模式
 	{
+		//根据云台的姿态求出z轴的角速度
+		float yawVel = cos(mAngle.y)*cos(mAngle.x)*mIns.GetGyr().z - mIns.GetGyr().y*sin(mAngle.y) + mIns.GetGyr().x*sin(mAngle.y)*sin(mAngle.x);
+		static float kd=0;
+		kd=mPIDYaw.mKd;
+		mPIDYaw.mKd = 0;
+		yaw__ = yawVel*kd*100;
+		v3 = mPIDYaw.Controll(mTargetAngle.z,mAngle.z)+yaw__;
+		mPIDYaw.mKd = kd;
 	}
 	else if(mYawMode == 3)//绝对静止模式
 	{
@@ -265,6 +277,9 @@ bool Gimbal::SaveParam2Flash()
 	// 	return false;
 	// ReadParam2Flash();
 	CheckMotorDisable();
+	mPIDYaw.mKp*=0.01;
+	mPIDYaw.mKi*=0.01;
+	mPIDYaw.mKd*=0.01;
 	return mParameter.SaveParam2Flash(mPIDRoll,mPIDPitch,mPIDYaw,mIns.GetGyrOffset(),mMag->GetOffsetRatio(),mMag->GetOffsetBias());
 }
 

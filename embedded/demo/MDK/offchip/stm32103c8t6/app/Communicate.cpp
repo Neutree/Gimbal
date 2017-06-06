@@ -179,7 +179,7 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 		{
 			ANO_DT_Send_PID(1,mGimbal.mPIDRoll.mKp,mGimbal.mPIDRoll.mKi,mGimbal.mPIDRoll.mKd,
 							  mGimbal.mPIDPitch.mKp,mGimbal.mPIDPitch.mKi,mGimbal.mPIDPitch.mKd,
-							  mGimbal.mPIDYaw.mKp,mGimbal.mPIDYaw.mKi,mGimbal.mPIDYaw.mKd);
+							  mGimbal.mPIDYaw.mKp*100,mGimbal.mPIDYaw.mKi*100,mGimbal.mPIDYaw.mKd*100);
 		}
 		if(*(data_buf+4)==0X02)
 		{
@@ -200,6 +200,9 @@ void Communicate::ANO_DT_Data_Receive_Anl(Gimbal& data,u8 *data_buf,u8 num)
 		mGimbal.mTargetAngle.x = -( (vs16)(*(data_buf+10)<<8)|*(data_buf+11) )*AtR;
 		mGimbal.mTargetAngle.y = ( (vs16)(*(data_buf+8)<<8)|*(data_buf+9) )*AtR;
 		mGimbal.mTargetAngle.z = ( (vs16)(*(data_buf+6)<<8)|*(data_buf+7) )*AtR;
+		//是否需要反向
+		mGimbal.mTargetAngle.y = -mGimbal.mTargetAngle.y;
+		mGimbal.mTargetAngle.z = -mGimbal.mTargetAngle.z;
 	}
 
 	if(*(data_buf+2)==0X10)								//PID1

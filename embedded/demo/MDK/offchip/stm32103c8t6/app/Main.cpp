@@ -72,7 +72,7 @@ void init()
 		ledGreen.On();
 	gimbal.Init(1);//电位器控制yaw轴，参数为2表示磁力计作为yaw轴的数据
 	gimbal.mIsArmed = true;
-	gimbal.mYawMode = 2;//静止模式
+	gimbal.mYawMode = 1;//跟随模式
 }
 
 int motorValueRoll,motorValuePitch,motorValueYaw;

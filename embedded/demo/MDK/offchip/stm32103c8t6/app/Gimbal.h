@@ -65,7 +65,8 @@ public:
 	PIDController mPIDRoll,mPIDPitch,mPIDYaw;
 
 	bool mIsArmed;
-	Vector3f mTargetAngle;
+	Vector3f mTargetAngle,mTargetAngleTemp;
+	float yaw__;
 	uint8_t mYawMode;//航向模式 1:跟随模式 2：静止模式 3：绝对静止模式（相对于地球磁场方向静止）
 };
 
